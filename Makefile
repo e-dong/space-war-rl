@@ -10,19 +10,17 @@ dev: venv/dev_installed
 prod: venv/wheel_installed
 
 # venv setup and requirements.txt installed
-venv/requirements_installed: requirements.txt
+venv/venv_created: requirements.txt
 	test -d venv || python -m venv venv
-	. venv/bin/activate; pip install -r requirements.txt
-	touch venv/requirements_installed
+	touch venv/venv_created
 
 # Install requirements.txt to venv
-venv/dev_installed: venv/requirements_installed requirements-dev.txt setup.py
-	venv/bin/pip install -r requirements-dev.txt
-	venv/bin/pip install -e .
+venv/dev_installed: venv/venv_created requirements-dev.txt setup.py
+	venv/bin/pip install -e .[dev]
 	touch venv/dev_installed
 
 # Install the wheel in "production"
-venv/wheel_installed: venv/requirements_installed setup.py game/**.py game/assets/**
+venv/wheel_installed: venv/venv_created setup.py game/**.py game/assets/**
 	venv/bin/pip install .
 	touch venv/wheel_installed
 	
