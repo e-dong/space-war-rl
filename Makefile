@@ -1,15 +1,31 @@
-.PHONY: game
 
-venv/bin/activate: requirements.txt
-	python -m venv venv
-	venv/bin/pip install -r requirements.txt
+.PHONY: game game-prod
 
-dev: venv/bin/activate requirements-dev.txt
+# User CLI Targets
+# Default target
+game:
+	venv/bin/python -m game.main
+
+dev: venv/dev_installed
+prod: venv/wheel_installed
+
+# venv setup and requirements.txt installed
+venv/requirements_installed: requirements.txt
+	test -d venv || python -m venv venv
+	. venv/bin/activate; pip install -r requirements.txt
+	touch venv/requirements_installed
+
+# Install requirements.txt to venv
+venv/dev_installed: venv/requirements_installed requirements-dev.txt setup.py
 	venv/bin/pip install -r requirements-dev.txt
+	venv/bin/pip install -e .
+	touch venv/dev_installed
 
-game: venv/bin/activate
-	venv/bin/python -m game
-
+# Install the wheel in "production"
+venv/wheel_installed: venv/requirements_installed setup.py game/**.py game/assets/**
+	venv/bin/pip install .
+	touch venv/wheel_installed
+	
 clean:
 	rm -rf __pycache__
 	rm -rf venv
