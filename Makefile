@@ -21,7 +21,7 @@ venv/dev_installed: venv/venv_created requirements-dev.txt setup.py
 
 # Install the wheel in "production"
 venv/wheel_installed: venv/venv_created setup.py game/**.py game/assets/**
-	venv/bin/pip install .
+	venv/bin/pip install .[build]
 	touch venv/wheel_installed
 	
 clean:

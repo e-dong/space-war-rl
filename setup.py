@@ -14,6 +14,6 @@ def install_requires(file_name):
 setup(
     name="space-war-rl",
     install_requires=install_requires("requirements.txt"),
-    extras_require={"dev": install_requires("requirements-dev.txt")},
+    extras_require={"dev": install_requires("requirements-dev.txt"), "build": ["wheel"]},
     packages=find_packages(),
 )
