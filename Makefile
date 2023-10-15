@@ -26,4 +26,5 @@ venv/wheel_installed: venv/venv_created setup.py game/**.py game/assets/**
 	
 clean:
 	rm -rf __pycache__
+	rm -rf build
 	rm -rf venv
