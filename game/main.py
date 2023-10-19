@@ -40,9 +40,9 @@ def main():
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
 
+        # draw sprites to screen and update display
         player_single_group.draw(screen)
         player_single_group.update()
-
         pygame.display.update()
 
     pygame.quit()
