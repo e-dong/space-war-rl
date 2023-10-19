@@ -1,10 +1,14 @@
 
-.PHONY: game game-prod
+.PHONY: game dev prod
 
 # User CLI Targets
 # Default target
 game:
 	venv/bin/python -m game.main
+
+########################################################
+# Dependencies
+########################################################
 
 dev: venv/dev_installed
 prod: venv/wheel_installed
@@ -25,6 +29,15 @@ venv/wheel_installed: venv/venv_created setup.py game/**.py game/assets/**
 	touch venv/wheel_installed
 	
 clean:
-	rm -rf __pycache__
-	rm -rf build
-	rm -rf venv
+	git clean -fdx
+
+########################################################
+# Development
+########################################################
+format: dev
+	venv/bin/black game/**.py
+
+lint: dev
+	venv/bin/pylint game/**.py
+	venv/bin/flake8 game/**.py
+	venv/bin/isort game/**.py
