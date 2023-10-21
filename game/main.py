@@ -11,6 +11,7 @@ def main():
     """Entrypoint for starting up the pygame"""
     # pygame setup
     pygame.init()
+    pygame.key.set_repeat(100, 100)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # delta time in seconds since last frame, used for framerate-
@@ -19,14 +20,13 @@ def main():
     delta_time = clock.tick(MAX_FPS) / 1000
 
     # Groups
-    player_single_group = pygame.sprite.GroupSingle()
-    player_single_group.add(
-        Player(
-            delta_time=delta_time,
-            image_path=module_path() / "assets" / "player_1.png",
-            start_pos=(screen.get_width() / 2, screen.get_height() / 2),
-        )
+    player_1 = Player(
+        delta_time=delta_time,
+        image_path=module_path() / "assets" / "player_1.png",
+        start_pos=(screen.get_width() / 2, screen.get_height() / 2),
     )
+    player_single_group = pygame.sprite.GroupSingle()
+    player_single_group.add(player_1)
 
     running = True
 
@@ -34,6 +34,7 @@ def main():
         # event loop
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
+            player_1.handle_events(event)
             if event.type == pygame.QUIT:
                 running = False
 
