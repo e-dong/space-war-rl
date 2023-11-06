@@ -13,6 +13,7 @@ def install_requires(file_name):
 
 setup(
     name="space-war-rl",
+    version="0.2",
     install_requires=install_requires("requirements.txt"),
     extras_require={
         "dev": install_requires("requirements-dev.txt"),
