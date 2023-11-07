@@ -7,8 +7,10 @@
       "source.organizeImports": true
     }
   },
+  "editor.rulers": [80],
   "black-formatter.path": ["venv/bin/black"],
   "black-formatter.importStrategy": "fromEnvironment",
+  "black-formatter.args": ["--line-length", "80"],
   "isort.args": ["--profile", "black"],
   "isort.path": ["venv/bin/isort"],
   "pylint.path": ["venv/bin/pylint"],

@@ -35,7 +35,7 @@ clean:
 # Development
 ########################################################
 format: dev
-	venv/bin/black game/**.py
+	venv/bin/black --line-length 80 game/**.py
 
 lint: dev
 	venv/bin/pylint game/**.py
