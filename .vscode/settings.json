@@ -18,5 +18,16 @@
   "pylint.args": ["--extension-pkg-whitelist=pygame"],
   "flake8.path": ["venv/bin/flake8"],
   "flake8.importStrategy": "fromEnvironment",
-  "cSpell.words": ["DDPG", "Dota"]
+  "cSpell.words": [
+    "centerx",
+    "centery",
+    "DDPG",
+    "Dota",
+    "KEYDOWN",
+    "KEYUP",
+    "newrect",
+    "newsurf",
+    "pygame",
+    "USEREVENT"
+  ]
 }
