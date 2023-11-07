@@ -20,14 +20,10 @@ def main():
     pygame.time.set_timer(check_key_event, CHECK_KEYS_TIME_DELAY_MS)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    # delta time in seconds since last frame, used for framerate-
-    # independent physics.
     clock = pygame.time.Clock()
-    delta_time = clock.tick(MAX_FPS) / 1000
 
     # Groups
     player_1 = Player(
-        delta_time=delta_time,
         image_path=module_path() / "assets" / "player_1.png",
         start_pos=(screen.get_width() / 2, screen.get_height() / 2),
     )
@@ -37,6 +33,7 @@ def main():
     running = True
 
     while running:
+        clock.tick(MAX_FPS)
         # event loop
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():

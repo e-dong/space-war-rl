@@ -48,8 +48,8 @@ class Player(Sprite):
 
             # Update acceleration
             if accelerate:
-                self.x_vel += 0.2 * math.cos(self.ang * math.pi / 180)
-                self.y_vel += 0.2 * math.sin(self.ang * math.pi / 180)
+                self.x_vel += math.cos(self.ang * math.pi / 180)
+                self.y_vel += math.sin(self.ang * math.pi / 180)
             # Update rotation
             if rotate_ccw:
                 self.ang -= 22.5
