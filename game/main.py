@@ -3,7 +3,12 @@
 import pygame
 
 from game import module_path
-from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
+from game.conf import (
+    CHECK_KEYS_TIME_DELAY_MS,
+    MAX_FPS,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+)
 from game.player import Player
 
 
@@ -11,7 +16,8 @@ def main():
     """Entrypoint for starting up the pygame"""
     # pygame setup
     pygame.init()
-    pygame.key.set_repeat(100, 100)
+    check_key_event = pygame.USEREVENT + 1
+    pygame.time.set_timer(check_key_event, CHECK_KEYS_TIME_DELAY_MS)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # delta time in seconds since last frame, used for framerate-
@@ -34,7 +40,7 @@ def main():
         # event loop
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
-            player_1.handle_events(event)
+            player_1.handle_events(event, check_key_event)
             if event.type == pygame.QUIT:
                 running = False
 
