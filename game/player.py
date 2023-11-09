@@ -9,21 +9,21 @@ from pygame.sprite import Sprite
 from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
-class Player(Sprite):
+class HumanPlayer(Sprite):
     """Represents the human player"""
 
     def __init__(self, image_path, start_pos, start_ang=0) -> None:
         super().__init__()
         self.surf = image.load(image_path).convert_alpha()
-        self.ang = start_ang
         self.image = self.surf
         self.pos = start_pos
         self.rect = self.surf.get_rect(center=self.pos)
         self.x_vel = 0
         self.y_vel = 0
+        self.ang = start_ang
         self.rotate_left = False
         self.rotate_right = False
-        self.rotate_cc_lock = False
+        self.rotate_ccw_lock = False
 
     def handle_events(self, event: Event, check_key_event: Event):
         """Handles keyboard input to update ship's rotation and position
@@ -32,18 +32,18 @@ class Player(Sprite):
         if event.type == KEYDOWN:
             # Handle ship movement and rotation
             if event.key == K_a:
-                self.rotate_cc_lock = True
+                self.rotate_ccw_lock = True
             if event.key == K_d:
-                self.rotate_cc_lock = False
+                self.rotate_ccw_lock = False
         if event.type == KEYUP:
             if event.key == K_a:
-                self.rotate_cc_lock = False
+                self.rotate_ccw_lock = False
             if event.key == K_d:
-                self.rotate_cc_lock = True
+                self.rotate_ccw_lock = True
         if event.type == check_key_event:
             keys = key.get_pressed()
-            rotate_ccw = keys[K_a] and self.rotate_cc_lock
-            rotate_cc = keys[K_d] and not self.rotate_cc_lock
+            rotate_ccw = keys[K_a] and self.rotate_ccw_lock
+            rotate_cc = keys[K_d] and not self.rotate_ccw_lock
             accelerate = keys[K_s]
 
             # Update acceleration
