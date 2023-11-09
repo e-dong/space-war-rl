@@ -21,8 +21,6 @@ class HumanPlayer(Sprite):
         self.x_vel = 0
         self.y_vel = 0
         self.ang = start_ang
-        self.rotate_left = False
-        self.rotate_right = False
         self.rotate_ccw_lock = False
 
     def handle_events(self, event: Event, check_key_event: Event):
