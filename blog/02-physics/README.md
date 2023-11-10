@@ -1,5 +1,5 @@
 ---
-title: Space War RL #2: Adding Physics and  Tweaking Player Movement
+title: Space War RL #2: Adding Physics and Finalizing Player Movement
 series: Space War RL Dev Blog
 published: false
 description:
@@ -75,15 +75,7 @@ The check for D appears to be first causing inconsistent behavior. I want to see
 
 I decided not to copy this behavior and fixed it in my implementation.
 
-Requirements:
-
-1. Holding down 'A' first and then holding down 'D', should switch rotation from counterclockwise to clockwise
-1. While still holding down 'A', releasing the 'D` key should switch rotation from clockwise to counterclockwise
-
-Also check for holding down 'D' first
-
-1. Holding down 'D' first and then holding down 'A', should switch rotation from clockwise to counterclockwise
-1. While still holding down 'D', releasing the 'A' key should switch rotation from counterclockwise to clockwise
+This is the code that fixes this bug.
 
 ```python
 def handle_events(self, event: Event, check_key_event: Event):
@@ -114,9 +106,21 @@ def handle_events(self, event: Event, check_key_event: Event):
         self.ang %= 360
 ```
 
-![Rotation Fix](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qzlenmcydmacnd3mydum.gif) <figcaption>Rotation Fix</figcaption>
+I am using the the `self.rotate_ccw_lock` field as a way to detect when the `A` or `D` is first pressed.
 
----
+```python
+# create custom event to check user input
+check_key_event = pygame.USEREVENT + 1
+pygame.time.set_timer(check_key_event, CHECK_KEYS_TIME_DELAY_MS)
+...
+
+while running:
+    # event loop
+    for event in pygame.event.get():
+        player_one.handle_events(event, check_key_event)
+```
+
+![Rotation Fix](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qzlenmcydmacnd3mydum.gif) <figcaption>Rotation Fix</figcaption>
 
 ## Adding Zero Gravity Physics
 
