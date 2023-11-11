@@ -19,15 +19,24 @@
   "flake8.path": ["venv/bin/flake8"],
   "flake8.importStrategy": "fromEnvironment",
   "cSpell.words": [
+    "arange",
     "centerx",
     "centery",
     "DDPG",
     "Dota",
+    "elif",
     "KEYDOWN",
+    "keypress",
+    "keypresses",
     "KEYUP",
+    "kwargs",
     "newrect",
     "newsurf",
+    "numpy",
+    "pseudocode",
     "pygame",
+    "reinforcementlearning",
+    "spacewar",
     "USEREVENT"
   ]
 }
