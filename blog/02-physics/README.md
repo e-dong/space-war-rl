@@ -1,15 +1,3 @@
----
-title: Adding Physics and Finalizing Player Movement
-series: Space War RL Dev Blog
-published: false
-description:
-tags: reinforcementlearning,ai, pygame, spacewar
-cover_image: https://res.cloudinary.com/practicaldev/image/fetch/s--24gbx7Fs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_66%2Cw_800/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mr8wm4n8vtzvzbsy33ck.gif
-# cover_image: https://direct_url_to_image.jpg
-# Use a ratio of 100:42 for best results.
-# published_at: 2023-10-29 14:31 +0000
----
-
 _This is an update for v0.3 of Space War RL! I made more updates to the player movement._
 
 ## Making Ship Rotation more Discrete

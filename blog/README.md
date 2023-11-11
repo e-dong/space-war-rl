@@ -1,14 +1,3 @@
----
-title: Space War RL #0: Series Introduction
-published: false
-description:
-tags: reinforcementlearning,ai, pygame, spacewar
-series: Space War RL Dev Blog
-# cover_image: https://direct_url_to_image.jpg
-# Use a ratio of 100:42 for best results.
-# published_at: 2023-10-29 14:02 +0000
----
-
 Machine learning is a field I always wanted to get into. I always thought I would need a masters or a PHD to get started; _Something I thought was out of my reach...until_ **recently**.  
 This year I had the opportunity to get my hands dirty; I got involved with a group that specializes in machine learning. I worked on some Reinforcement Learning (RL) projects at work, but only scratched the surface due to limited funding. Regardless, this was the spark that I was missing! Since there is limited opportunity at work, _I must carve a path for myself on my own_.
 

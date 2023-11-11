@@ -1,15 +1,3 @@
----
-title: Space War RL #1: Getting Started and Adding Player Movement
-series: Space War RL Dev Blog
-published: true
-description: Getting started with pygame and adding player movement
-tags: reinforcementlearning,ai, pygame, spacewar
-cover_image: https://res.cloudinary.com/practicaldev/image/fetch/s--24gbx7Fs--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_66%2Cw_800/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/mr8wm4n8vtzvzbsy33ck.gif
-# cover_image: https://direct_url_to_image.jpg
-# Use a ratio of 100:42 for best results.
-# published_at: 2023-10-29 14:31 +0000
----
-
 ## Selecting the Appropriate Simulator
 
 I was deciding whether I should use game engines like Godot, Unity, or Unreal, but ended using `pygame`. ML libraries are primarily in python, so `pygame` and OpenAI `gym` are a good choice. Space War also has simple graphics, so I don't need the overhead of the game engine. I ended up going with `pygame` because I only used `gym` at work and wanted to try something new. `pygame` also seemed easier to add my own graphics, add human controls, and manage collisions (e.g. implement damage dealt to player from weapons) compared to `gym`. However if I want to make the simulation more complex and add game-like features, I will revisit game engines. I think having a level editor would be helpful if I want to test if RL agents can generalize to different environments. I may also try using a game engine to train RL agents in 3D environments, but that's for a future project!
