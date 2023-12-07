@@ -31,8 +31,13 @@ class HumanPlayer(Sprite):
             # Handle ship movement and rotation
             if event.key == K_a:
                 self.rotate_ccw_lock = True
+                self.ang -= 22.5
             if event.key == K_d:
                 self.rotate_ccw_lock = False
+                self.ang += 22.5
+            if event.key == K_s:
+                self.x_vel += math.cos(self.ang * math.pi / 180)
+                self.y_vel += math.sin(self.ang * math.pi / 180)
         if event.type == KEYUP:
             if event.key == K_a:
                 self.rotate_ccw_lock = False
