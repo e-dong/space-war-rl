@@ -3,12 +3,7 @@
 import pygame
 
 from game import module_path
-from game.conf import (
-    CHECK_KEYS_TIME_DELAY_MS,
-    MAX_FPS,
-    SCREEN_HEIGHT,
-    SCREEN_WIDTH,
-)
+from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
 from game.player import HumanPlayer
 
 
@@ -17,9 +12,6 @@ def main():
     # pygame setup
     pygame.init()
 
-    # create custom event to check user input
-    check_key_event = pygame.USEREVENT + 1
-    pygame.time.set_timer(check_key_event, CHECK_KEYS_TIME_DELAY_MS)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     clock = pygame.time.Clock()
@@ -37,7 +29,7 @@ def main():
     while running:
         # event loop
         for event in pygame.event.get():
-            player_one.handle_events(event, check_key_event)
+            player_one.handle_events(event)
             # pygame.QUIT event means the user clicked X to close your window
             if event.type == pygame.QUIT:
                 running = False
