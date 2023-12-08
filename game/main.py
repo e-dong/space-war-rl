@@ -5,6 +5,7 @@ import pygame
 from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
 from game.player import HumanPlayer
+from game.projectile import PhotonTorpedo
 
 
 def main():
@@ -24,6 +25,9 @@ def main():
     player_single_group = pygame.sprite.GroupSingle()
     player_single_group.add(player_one)
 
+    projectile_group = pygame.sprite.Group()
+    projectile_group.add(PhotonTorpedo())
+
     running = True
 
     while running:
@@ -39,7 +43,9 @@ def main():
 
         # draw sprites to screen and update display
         player_single_group.draw(screen)
+        projectile_group.draw(screen)
         player_single_group.update()
+        projectile_group.update()
         pygame.display.update()
 
         clock.tick(MAX_FPS)
