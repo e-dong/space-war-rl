@@ -82,11 +82,6 @@ class HumanPlayer(Sprite):
         self.pos = (x_pos, y_pos)
 
         # Update rotation to surface
-        current_rect = self.surf.get_rect()
         newsurf = transform.rotate(self.surf, -self.ang)
-        newrect = newsurf.get_rect()
-
-        # put new surface rect center on same spot as old surface rect center
-        self.rect.x += current_rect.centerx - newrect.centerx
-        self.rect.y += current_rect.centery - newrect.centery
+        self.rect = newsurf.get_rect(center=self.pos)
         self.image = newsurf
