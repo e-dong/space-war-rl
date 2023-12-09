@@ -5,28 +5,25 @@ import pygame
 from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
 from game.player import HumanPlayer
-from game.projectile import PhotonTorpedo
 
 
 def main():
     """Entrypoint for starting up the pygame"""
     # pygame setup
     pygame.init()
-
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
     clock = pygame.time.Clock()
 
     # Groups
+    projectile_group = pygame.sprite.Group()
     player_one = HumanPlayer(
         image_path=module_path() / "assets" / "player_one.png",
         start_pos=(screen.get_width() / 2, screen.get_height() / 2),
+        projectile_group=projectile_group,
     )
     player_single_group = pygame.sprite.GroupSingle()
     player_single_group.add(player_one)
-
-    projectile_group = pygame.sprite.Group()
-    projectile_group.add(PhotonTorpedo())
+    # TODO: Add player 2
 
     running = True
 
@@ -43,9 +40,11 @@ def main():
 
         # draw sprites to screen and update display
         player_single_group.draw(screen)
-        projectile_group.draw(screen)
+        # TODO: If player gets more groups, it may be good to have a
+        # Player.draw_groups() function
+        player_one.projectile_group.draw(screen)
         player_single_group.update()
-        projectile_group.update()
+        player_one.projectile_group.update()
         pygame.display.update()
 
         clock.tick(MAX_FPS)

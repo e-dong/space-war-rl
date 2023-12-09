@@ -8,22 +8,38 @@ from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class SpaceEntity(pygame.sprite.Sprite):
     """A base class for objects that move in space,
-    like ships and projectiles
+    like ships and projectiles. State is manged internally.
+
+    Attributes:
+        surf: The reference to the original Surface, used for rotation
+        image: The reference to the latest surface based on the other
+               state vars
+        pos: The x,y of the position on the screen
+        rect: The rect object
+        vel: The velocity of the space entity
+        ang: The angle in degrees representing the direction the ship is facing
     """
 
-    def __init__(self, start_pos, start_ang, surf) -> None:
+    surf: pygame.surface.Surface
+    image: pygame.surface.Surface
+    pos: tuple[int, int]
+    rect: pygame.rect.Rect
+    vel: tuple[float, float]
+    ang: float
+
+    def __init__(self, surf, start_pos, start_ang=0, start_vel=(0, 0)) -> None:
         super().__init__()
         self.surf = surf
         self.image = surf
         self.pos = start_pos
-        self.rect = self.surf.get_rect(center=self.pos)
-        self.x_vel = 0
-        self.y_vel = 0
+        self.rect = surf.get_rect(center=self.pos)
+        self.vel = start_vel
         self.ang = start_ang
 
     def update(self, *args, **kwargs):
         """Entrypoint for updating the player state each frame"""
         x_pos, y_pos = self.pos
+        x_vel, y_vel = self.vel
 
         # Conditions for wrapping around the screen
         if x_pos >= SCREEN_WIDTH + 10:
@@ -36,14 +52,13 @@ class SpaceEntity(pygame.sprite.Sprite):
             y_pos = SCREEN_HEIGHT
 
         # Apply velocity to position
-        x_pos += self.x_vel
-        y_pos += self.y_vel
+        x_pos += x_vel
+        y_pos += y_vel
         self.rect.x = x_pos
         self.rect.y = y_pos
         self.pos = (x_pos, y_pos)
 
         # Update rotation to surface
         self.ang %= 360
-        newsurf = pygame.transform.rotate(self.surf, -self.ang)
-        self.rect = newsurf.get_rect(center=self.pos)
-        self.image = newsurf
+        self.image = pygame.transform.rotate(self.surf, -self.ang)
+        self.rect = self.image.get_rect(center=self.pos)

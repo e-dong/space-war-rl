@@ -1,30 +1,47 @@
 """Collection of Player Classes"""
 import math
+from pathlib import Path
 
 import pygame
 
 from game.base import SpaceEntity
-from game.conf import CHECK_KEYS_TIME_DELAY_MS
+from game.conf import CHECK_KEYS_TIME_DELAY_MS, WEAPON_FIRE_TIME_DEPLAY_MS
+from game.projectile import PhotonTorpedo
 
 
 class HumanPlayer(SpaceEntity):
-    """Represents the human player"""
+    """Represents the human player."""
 
-    def __init__(self, image_path, start_pos, start_ang=0) -> None:
+    projectile_group: pygame.sprite.Group
+    rotate_ccw_lock: bool
+    check_rotate_cc_repeat_event: pygame.USEREVENT
+    check_rotate_cw_repeat_event: pygame.USEREVENT
+    check_acc_repeat_event: pygame.USEREVENT
+    check_fire_torpedoes_event: pygame.USEREVENT
+
+    def __init__(
+        self,
+        image_path: Path,
+        start_pos: tuple[int, int],
+        projectile_group: pygame.sprite.Group,
+    ) -> None:
         super().__init__(
-            start_pos, start_ang, pygame.image.load(image_path).convert_alpha()
+            pygame.image.load(image_path).convert_alpha(),
+            start_pos,
         )
-
+        self.projectile_group = projectile_group
         self.rotate_ccw_lock = False
 
         # create custom event to check user input
         self.check_rotate_cc_repeat_event = pygame.USEREVENT + 1
         self.check_rotate_cw_repeat_event = pygame.USEREVENT + 2
         self.check_acc_repeat_event = pygame.USEREVENT + 3
+        self.check_fire_torpedoes_event = pygame.USEREVENT + 4
 
     def handle_events(self, event: pygame.event.Event):
         """Handles keyboard input to update ship's rotation and position
-        state
+        state. This method should be called from the event loop to pass the
+        event object.
         """
         if event.type == pygame.KEYDOWN:
             # Handle ship movement and rotation
@@ -42,10 +59,23 @@ class HumanPlayer(SpaceEntity):
                     self.check_rotate_cw_repeat_event, CHECK_KEYS_TIME_DELAY_MS
                 )
             if event.key == pygame.constants.K_s:
-                self.x_vel += math.cos(self.ang * math.pi / 180)
-                self.y_vel += math.sin(self.ang * math.pi / 180)
+                x_vel, y_vel = self.vel
+                x_vel += math.cos(self.ang * math.pi / 180)
+                y_vel += math.sin(self.ang * math.pi / 180)
+                self.vel = (x_vel, y_vel)
                 pygame.time.set_timer(
                     self.check_acc_repeat_event, CHECK_KEYS_TIME_DELAY_MS
+                )
+            if event.key == pygame.constants.K_e:
+                self.projectile_group.add(
+                    PhotonTorpedo(
+                        start_pos=self.pos,
+                        start_ang=self.ang,
+                        start_vel=self.vel,
+                    )
+                )
+                pygame.time.set_timer(
+                    self.check_fire_torpedoes_event, WEAPON_FIRE_TIME_DEPLAY_MS
                 )
         if event.type == pygame.KEYUP:
             if event.key == pygame.constants.K_a:
@@ -57,7 +87,8 @@ class HumanPlayer(SpaceEntity):
                 pygame.time.set_timer(self.check_rotate_cw_repeat_event, 0)
             if event.key == pygame.constants.K_s:
                 pygame.time.set_timer(self.check_acc_repeat_event, 0)
-
+            if event.key == pygame.constants.K_e:
+                pygame.time.set_timer(self.check_fire_torpedoes_event, 0)
         if event.type == self.check_rotate_cc_repeat_event:
             # Update rotation
             if self.rotate_ccw_lock:
@@ -68,5 +99,13 @@ class HumanPlayer(SpaceEntity):
                 self.ang += 22.5
             self.ang %= 360
         if event.type == self.check_acc_repeat_event:
-            self.x_vel += math.cos(self.ang * math.pi / 180)
-            self.y_vel += math.sin(self.ang * math.pi / 180)
+            x_vel, y_vel = self.vel
+            x_vel += math.cos(self.ang * math.pi / 180)
+            y_vel += math.sin(self.ang * math.pi / 180)
+            self.vel = (x_vel, y_vel)
+        if event.type == self.check_fire_torpedoes_event:
+            self.projectile_group.add(
+                PhotonTorpedo(
+                    start_pos=self.pos, start_ang=self.ang, start_vel=self.vel
+                )
+            )
