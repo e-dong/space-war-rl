@@ -42,6 +42,8 @@ def main():
         player_single_group.draw(screen)
         # TODO: If player gets more groups, it may be good to have a
         # Player.draw_groups() function
+        # TODO: Add logic to check collisions inorder to handle damage and
+        # removing the torpedo from the group
         player_one.projectile_group.draw(screen)
         player_single_group.update()
         player_one.projectile_group.update()

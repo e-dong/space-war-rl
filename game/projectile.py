@@ -7,6 +7,7 @@ from pygame import Surface
 
 from game.base import SpaceEntity
 
+# TODO Add timeout, so torpedoes don't stay on the screen forever
 
 class PhotonTorpedo(SpaceEntity):
     """Represents the photon torpedo object that a ship can fire"""

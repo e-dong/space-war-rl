@@ -68,6 +68,7 @@ class HumanShip(SpaceEntity):
                 pygame.time.set_timer(
                     self.check_acc_repeat_event, CHECK_KEYS_TIME_DELAY_MS
                 )
+            # TODO: Only allow a max number of torpedoes
             if event.key == pygame.constants.K_e:
                 self.projectile_group.add(
                     PhotonTorpedo(
@@ -105,6 +106,7 @@ class HumanShip(SpaceEntity):
             x_vel += math.cos(self.ang * math.pi / 180)
             y_vel += math.sin(self.ang * math.pi / 180)
             self.vel = (x_vel, y_vel)
+        # TODO: Only allow a max number of torpedoes
         if event.type == self.check_fire_torpedoes_event:
             self.projectile_group.add(
                 PhotonTorpedo(
