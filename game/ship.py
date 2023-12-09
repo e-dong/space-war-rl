@@ -1,4 +1,4 @@
-"""Collection of Player Classes"""
+"""Collection of Ship Classes"""
 import math
 from pathlib import Path
 
@@ -9,8 +9,10 @@ from game.conf import CHECK_KEYS_TIME_DELAY_MS, WEAPON_FIRE_TIME_DEPLAY_MS
 from game.projectile import PhotonTorpedo
 
 
-class HumanPlayer(SpaceEntity):
-    """Represents the human player."""
+# TODO: Create a bass class for ship,
+# refactor the interaction logic into "actions"
+class HumanShip(SpaceEntity):
+    """Represents the ship controlled by a human player"""
 
     projectile_group: pygame.sprite.Group
     rotate_ccw_lock: bool

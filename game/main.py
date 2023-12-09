@@ -4,7 +4,7 @@ import pygame
 
 from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
-from game.player import HumanPlayer
+from game.ship import HumanShip
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
 
     # Groups
     projectile_group = pygame.sprite.Group()
-    player_one = HumanPlayer(
+    player_one = HumanShip(
         image_path=module_path() / "assets" / "player_one.png",
         start_pos=(screen.get_width() / 2, screen.get_height() / 2),
         projectile_group=projectile_group,
