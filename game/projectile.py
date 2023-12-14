@@ -25,8 +25,8 @@ class PhotonTorpedo(SpaceEntity):
 
         # Apply torpedoes velocity on ship's velocity
         x_vel, y_vel = self.vel
-        x_vel += 2 * math.cos(self.ang * math.pi / 180)
-        y_vel += 2 * math.sin(self.ang * math.pi / 180)
+        x_vel += 3 * math.cos(self.ang * math.pi / 180)
+        y_vel += 3 * math.sin(self.ang * math.pi / 180)
         self.vel = (x_vel, y_vel)
 
     def update(self, *args, **kwargs):
