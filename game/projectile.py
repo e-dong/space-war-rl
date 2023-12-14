@@ -6,7 +6,42 @@ import pygame
 from pygame import Surface
 
 from game.base import SpaceEntity
-from game.conf import TORPEDO_MAX_FLIGHT_MS, TORPEDO_SPEED
+from game.conf import TORPEDO_MAX_FLIGHT_MS, TORPEDO_SPEED, WEAPON
+
+
+class Phaser(SpaceEntity):
+    def __init__(
+        self, start_pos, start_ang, start_vel, projectile_group
+    ) -> None:
+        self.type = WEAPON.PHASER
+        self.projectile_group = projectile_group
+        surf = Surface([100, 1]).convert_alpha()
+        super().__init__(surf, start_pos, start_ang, start_vel)
+
+        # Draw a line to represent phaser
+        self.rect = pygame.draw.line(
+            self.image, "white", start_pos=(10, 0), end_pos=(99, 0)
+        )
+
+        self.start_time = pygame.time.get_ticks()
+        self.active = True
+
+        # Update rotation to surface
+        self.ang %= 360
+        self.image = pygame.transform.rotate(self.surf, -self.ang)
+        self.rect = self.image.get_rect(center=self.pos)
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        flight_time = pygame.time.get_ticks() - self.start_time
+        if flight_time > 100:
+            self.projectile_group.remove(self)
+
+    def check_active(self):
+        flight_time = pygame.time.get_ticks() - self.start_time
+        if flight_time > 300:
+            return False
+        return True
 
 
 class PhotonTorpedo(SpaceEntity):
@@ -15,6 +50,7 @@ class PhotonTorpedo(SpaceEntity):
     def __init__(
         self, start_pos, start_ang, start_vel, projectile_group
     ) -> None:
+        self.type = WEAPON.TORPEDO
         surf = Surface([12, 12]).convert_alpha()
         super().__init__(surf, start_pos, start_ang, start_vel)
 
@@ -47,5 +83,6 @@ class PhotonTorpedo(SpaceEntity):
 
         for projectile in self.projectile_group.sprites():
             if projectile != self and self.rect.colliderect(projectile.rect):
-                self.projectile_group.remove(projectile)
+                if projectile.type != WEAPON.PHASER:
+                    self.projectile_group.remove(projectile)
                 self.projectile_group.remove(self)

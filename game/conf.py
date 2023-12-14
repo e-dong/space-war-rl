@@ -1,4 +1,11 @@
 """Constants / Confguration for game"""
+from enum import Enum
+
+
+class WEAPON(Enum):
+    TORPEDO, PHASER = range(2)
+
+
 # limits FPS to 60
 MAX_FPS = 60
 # screen dimensions for pygame window
