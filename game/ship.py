@@ -5,7 +5,11 @@ from pathlib import Path
 import pygame
 
 from game.base import SpaceEntity
-from game.conf import CHECK_KEYS_TIME_DELAY_MS, WEAPON_FIRE_TIME_DEPLAY_MS
+from game.conf import (
+    CHECK_KEYS_TIME_DELAY_MS,
+    MAX_TORPEDOES_PER_SHIP,
+    WEAPON_FIRE_TIME_DEPLAY_MS,
+)
 from game.projectile import PhotonTorpedo
 
 
@@ -68,18 +72,26 @@ class HumanShip(SpaceEntity):
                 pygame.time.set_timer(
                     self.check_acc_repeat_event, CHECK_KEYS_TIME_DELAY_MS
                 )
-            # TODO: Only allow a max number of torpedoes
             if event.key == pygame.constants.K_e:
-                self.projectile_group.add(
-                    PhotonTorpedo(
-                        start_pos=self.pos,
-                        start_ang=self.ang,
-                        start_vel=self.vel,
+                if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
+                    torpedo_x_pos = self.pos[0] + 30 * math.cos(
+                        self.ang * math.pi / 180
                     )
-                )
-                pygame.time.set_timer(
-                    self.check_fire_torpedoes_event, WEAPON_FIRE_TIME_DEPLAY_MS
-                )
+                    torpedo_y_pos = self.pos[1] + 30 * math.sin(
+                        self.ang * math.pi / 180
+                    )
+                    self.projectile_group.add(
+                        PhotonTorpedo(
+                            start_pos=(torpedo_x_pos, torpedo_y_pos),
+                            start_ang=self.ang,
+                            start_vel=self.vel,
+                            projectile_group=self.projectile_group,
+                        )
+                    )
+                    pygame.time.set_timer(
+                        self.check_fire_torpedoes_event,
+                        WEAPON_FIRE_TIME_DEPLAY_MS,
+                    )
         if event.type == pygame.KEYUP:
             if event.key == pygame.constants.K_a:
                 self.rotate_ccw_lock = False
@@ -106,10 +118,26 @@ class HumanShip(SpaceEntity):
             x_vel += math.cos(self.ang * math.pi / 180)
             y_vel += math.sin(self.ang * math.pi / 180)
             self.vel = (x_vel, y_vel)
-        # TODO: Only allow a max number of torpedoes
         if event.type == self.check_fire_torpedoes_event:
-            self.projectile_group.add(
-                PhotonTorpedo(
-                    start_pos=self.pos, start_ang=self.ang, start_vel=self.vel
+            if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
+                torpedo_x_pos = self.pos[0] + 30 * math.cos(
+                    self.ang * math.pi / 180
                 )
-            )
+                torpedo_y_pos = self.pos[1] + 30 * math.sin(
+                    self.ang * math.pi / 180
+                )
+                self.projectile_group.add(
+                    PhotonTorpedo(
+                        start_pos=(torpedo_x_pos, torpedo_y_pos),
+                        start_ang=self.ang,
+                        start_vel=self.vel,
+                        projectile_group=self.projectile_group,
+                    )
+                )
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        for sprite in self.projectile_group.sprites():
+            if self.rect.colliderect(sprite.rect):
+                self.projectile_group.remove(sprite)
+                # TODO: apply damage to the ship for every collision

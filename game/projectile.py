@@ -6,13 +6,15 @@ import pygame
 from pygame import Surface
 
 from game.base import SpaceEntity
+from game.conf import TORPEDO_MAX_FLIGHT_MS
 
-# TODO Add timeout, so torpedoes don't stay on the screen forever
 
 class PhotonTorpedo(SpaceEntity):
     """Represents the photon torpedo object that a ship can fire"""
 
-    def __init__(self, start_pos, start_ang, start_vel) -> None:
+    def __init__(
+        self, start_pos, start_ang, start_vel, projectile_group
+    ) -> None:
         surf = Surface([12, 12]).convert_alpha()
         super().__init__(surf, start_pos, start_ang, start_vel)
 
@@ -29,9 +31,21 @@ class PhotonTorpedo(SpaceEntity):
         y_vel += 3 * math.sin(self.ang * math.pi / 180)
         self.vel = (x_vel, y_vel)
 
+        self.projectile_group = projectile_group
+        self.start_time = pygame.time.get_ticks()
+
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         # Torpedo needs to be rotated an additional 90 degrees
         # due to the orientation it was originally drawn
         self.image = pygame.transform.rotate(self.surf, -(self.ang + 90))
         self.rect = self.image.get_rect(center=self.pos)
+        # group and collision management
+        flight_time = pygame.time.get_ticks() - self.start_time
+        if flight_time > TORPEDO_MAX_FLIGHT_MS:
+            self.projectile_group.remove(self)
+
+        for projectile in self.projectile_group.sprites():
+            if projectile != self and self.rect.colliderect(projectile.rect):
+                self.projectile_group.remove(projectile)
+                self.projectile_group.remove(self)
