@@ -6,7 +6,7 @@ import pygame
 from pygame import Surface
 
 from game.base import SpaceEntity
-from game.conf import TORPEDO_MAX_FLIGHT_MS
+from game.conf import TORPEDO_MAX_FLIGHT_MS, TORPEDO_SPEED
 
 
 class PhotonTorpedo(SpaceEntity):
@@ -27,8 +27,8 @@ class PhotonTorpedo(SpaceEntity):
 
         # Apply torpedoes velocity on ship's velocity
         x_vel, y_vel = self.vel
-        x_vel += 3 * math.cos(self.ang * math.pi / 180)
-        y_vel += 3 * math.sin(self.ang * math.pi / 180)
+        x_vel += TORPEDO_SPEED * math.cos(self.ang * math.pi / 180)
+        y_vel += TORPEDO_SPEED * math.sin(self.ang * math.pi / 180)
         self.vel = (x_vel, y_vel)
 
         self.projectile_group = projectile_group
