@@ -6,6 +6,8 @@ from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
 from game.ship import HumanShip
 
+# TODO: Refactor collision logic in main
+
 
 def main():
     """Entrypoint for starting up the pygame"""
@@ -18,7 +20,10 @@ def main():
     projectile_group = pygame.sprite.Group()
     player_one = HumanShip(
         image_path=module_path() / "assets" / "player_one.png",
-        start_pos=(screen.get_width() / 2, screen.get_height() / 2),
+        start_pos=(
+            screen.get_width() / 4,
+            screen.get_height() / 4,
+        ),
         projectile_group=projectile_group,
     )
     player_single_group = pygame.sprite.GroupSingle()
