@@ -42,13 +42,13 @@ class SpaceEntity(pygame.sprite.Sprite):
         x_vel, y_vel = self.vel
 
         # Conditions for wrapping around the screen
-        if x_pos >= SCREEN_WIDTH + 10:
+        if x_pos >= SCREEN_WIDTH:
             x_pos = 0
-        elif x_pos <= -10:
+        elif x_pos <= 0:
             x_pos = SCREEN_WIDTH
-        if y_pos >= SCREEN_HEIGHT + 10:
+        if y_pos >= SCREEN_HEIGHT:
             y_pos = 0
-        elif y_pos <= -10:
+        elif y_pos <= 0:
             y_pos = SCREEN_HEIGHT
 
         # Apply velocity to position
