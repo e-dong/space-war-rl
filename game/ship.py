@@ -77,14 +77,8 @@ class HumanShip(SpaceEntity):
                 )
             if event.key == pygame.constants.K_q:
                 if not self.phaser or not self.phaser.check_active():
-                    phaser_x_pos = self.pos[0] + 40 * math.cos(
-                        self.ang * math.pi / 180
-                    )
-                    phaser_y_pos = self.pos[1] + 40 * math.sin(
-                        self.ang * math.pi / 180
-                    )
                     self.phaser = Phaser(
-                        start_pos=(phaser_x_pos, phaser_y_pos),
+                        start_pos=self.pos,
                         start_vel=self.vel,
                         start_ang=self.ang,
                         projectile_group=self.projectile_group,
@@ -96,15 +90,9 @@ class HumanShip(SpaceEntity):
                     )
             if event.key == pygame.constants.K_e:
                 if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
-                    torpedo_x_pos = self.pos[0] + 30 * math.cos(
-                        self.ang * math.pi / 180
-                    )
-                    torpedo_y_pos = self.pos[1] + 30 * math.sin(
-                        self.ang * math.pi / 180
-                    )
                     self.projectile_group.add(
                         PhotonTorpedo(
-                            start_pos=(torpedo_x_pos, torpedo_y_pos),
+                            start_pos=self.pos,
                             start_ang=self.ang,
                             start_vel=self.vel,
                             projectile_group=self.projectile_group,
@@ -143,10 +131,8 @@ class HumanShip(SpaceEntity):
             y_vel += math.sin(self.ang * math.pi / 180)
             self.vel = (x_vel, y_vel)
         if event.type == self.check_fire_phaser_event:
-            phaser_x_pos = self.pos[0] + 40 * math.cos(self.ang * math.pi / 180)
-            phaser_y_pos = self.pos[1] + 40 * math.sin(self.ang * math.pi / 180)
             self.phaser = Phaser(
-                start_pos=(phaser_x_pos, phaser_y_pos),
+                start_pos=self.pos,
                 start_vel=self.vel,
                 start_ang=self.ang,
                 projectile_group=self.projectile_group,
@@ -154,15 +140,9 @@ class HumanShip(SpaceEntity):
             self.projectile_group.add(self.phaser)
         if event.type == self.check_fire_torpedoes_event:
             if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
-                torpedo_x_pos = self.pos[0] + 30 * math.cos(
-                    self.ang * math.pi / 180
-                )
-                torpedo_y_pos = self.pos[1] + 30 * math.sin(
-                    self.ang * math.pi / 180
-                )
                 self.projectile_group.add(
                     PhotonTorpedo(
-                        start_pos=(torpedo_x_pos, torpedo_y_pos),
+                        start_pos=self.pos,
                         start_ang=self.ang,
                         start_vel=self.vel,
                         projectile_group=self.projectile_group,
@@ -171,10 +151,15 @@ class HumanShip(SpaceEntity):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
+        # TODO: apply damage to the ship for every collision
         for sprite in self.projectile_group.sprites():
             if (
                 self.rect.colliderect(sprite.rect)
                 and sprite.type == WEAPON.TORPEDO
             ):
                 self.projectile_group.remove(sprite)
-                # TODO: apply damage to the ship for every collision
+            if (
+                self.rect.colliderect(sprite.rect)
+                and sprite.type == WEAPON.PHASER
+            ):
+                pass

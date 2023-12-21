@@ -17,17 +17,31 @@ class Phaser(SpaceEntity):
         self.projectile_group = projectile_group
         surf = Surface([100, 1]).convert_alpha()
         super().__init__(surf, start_pos, start_ang, start_vel)
-
-        # Draw a line to represent phaser
-        self.rect = pygame.draw.line(
-            self.image, "white", start_pos=(10, 0), end_pos=(99, 0)
-        )
-
         self.start_time = pygame.time.get_ticks()
-        self.active = True
 
         # Update rotation to surface
+
         self.ang %= 360
+        self.ship_pos = start_pos
+        phaser_x_pos = self.pos[0] + 50 * math.cos(self.ang * math.pi / 180)
+        phaser_y_pos = self.pos[1] + 50 * math.sin(self.ang * math.pi / 180)
+
+        self.pos = (phaser_x_pos, phaser_y_pos)
+        surf = pygame.transform.rotate(self.surf, -self.ang)
+        self.rect = surf.get_rect(center=self.pos)
+        self.draw_laser()
+
+    def draw_laser(self, end_x=99):
+        # Draw a line to represent phaser
+        for projectile in self.projectile_group.sprites():
+            if projectile != self and self.rect.colliderect(projectile.rect):
+                end_x = math.dist(self.ship_pos, (projectile.rect.center))
+
+                self.projectile_group.remove(projectile)
+                break
+        pygame.draw.line(
+            self.image, "white", start_pos=(0, 0), end_pos=(end_x, 0)
+        )
         self.image = pygame.transform.rotate(self.surf, -self.ang)
         self.rect = self.image.get_rect(center=self.pos)
 
@@ -52,7 +66,11 @@ class PhotonTorpedo(SpaceEntity):
     ) -> None:
         self.type = WEAPON.TORPEDO
         surf = Surface([12, 12]).convert_alpha()
-        super().__init__(surf, start_pos, start_ang, start_vel)
+        torpedo_x_pos = start_pos[0] + 30 * math.cos(start_ang * math.pi / 180)
+        torpedo_y_pos = start_pos[1] + 30 * math.sin(start_ang * math.pi / 180)
+        super().__init__(
+            surf, (torpedo_x_pos, torpedo_y_pos), start_ang, start_vel
+        )
 
         # Draw on the surface of what the torpedo looks like
         pygame.draw.polygon(self.image, "white", [[5, 0], [3, 5], [7, 5]], 1)
@@ -85,4 +103,3 @@ class PhotonTorpedo(SpaceEntity):
             if projectile != self and self.rect.colliderect(projectile.rect):
                 if projectile.type != WEAPON.PHASER:
                     self.projectile_group.remove(projectile)
-                self.projectile_group.remove(self)
