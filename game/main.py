@@ -24,11 +24,23 @@ def main():
             screen.get_width() / 4,
             screen.get_height() / 4,
         ),
+        start_ang=0,
         projectile_group=projectile_group,
     )
-    player_single_group = pygame.sprite.GroupSingle()
-    player_single_group.add(player_one)
-    # TODO: Add player 2
+    player_two = HumanShip(
+        image_path=module_path() / "assets" / "player_one.png",
+        start_pos=(
+            screen.get_width() - screen.get_width() / 4,
+            screen.get_height() - screen.get_height() / 4,
+        ),
+        start_ang=180,
+        projectile_group=projectile_group,
+    )
+    player_one_group = pygame.sprite.GroupSingle()
+    player_one_group.add(player_one)
+
+    player_two_group = pygame.sprite.GroupSingle()
+    player_two_group.add(player_two)
 
     running = True
 
@@ -44,12 +56,12 @@ def main():
         screen.fill("black")
 
         # draw sprites to screen and update display
-        player_single_group.draw(screen)
-        # TODO: If player gets more groups, it may be good to have a
-        # Player.draw_groups() function
+        player_one_group.draw(screen)
+        player_two_group.draw(screen)
         player_one.projectile_group.draw(screen)
-        player_single_group.update()
+        player_one_group.update()
         player_one.projectile_group.update()
+        player_two_group.update()
         pygame.display.update()
 
         clock.tick(MAX_FPS)

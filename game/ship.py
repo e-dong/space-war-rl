@@ -30,11 +30,11 @@ class HumanShip(SpaceEntity):
         self,
         image_path: Path,
         start_pos: tuple[int, int],
+        start_ang: float,
         projectile_group: pygame.sprite.Group,
     ) -> None:
         super().__init__(
-            pygame.image.load(image_path).convert_alpha(),
-            start_pos,
+            pygame.image.load(image_path).convert_alpha(), start_pos, start_ang
         )
         self.projectile_group = projectile_group
         self.phaser = None
@@ -78,6 +78,7 @@ class HumanShip(SpaceEntity):
             if event.key == pygame.constants.K_q:
                 if not self.phaser or not self.phaser.check_active():
                     self.phaser = Phaser(
+                        ship=self,
                         start_pos=self.pos,
                         start_vel=self.vel,
                         start_ang=self.ang,
@@ -132,6 +133,7 @@ class HumanShip(SpaceEntity):
             self.vel = (x_vel, y_vel)
         if event.type == self.check_fire_phaser_event:
             self.phaser = Phaser(
+                ship=self,
                 start_pos=self.pos,
                 start_vel=self.vel,
                 start_ang=self.ang,
@@ -161,5 +163,6 @@ class HumanShip(SpaceEntity):
             if (
                 self.rect.colliderect(sprite.rect)
                 and sprite.type == WEAPON.PHASER
+                and sprite.firing_ship != self
             ):
                 pass

@@ -11,8 +11,9 @@ from game.conf import TORPEDO_MAX_FLIGHT_MS, TORPEDO_SPEED, WEAPON
 
 class Phaser(SpaceEntity):
     def __init__(
-        self, start_pos, start_ang, start_vel, projectile_group
+        self, ship, start_pos, start_ang, start_vel, projectile_group
     ) -> None:
+        self.firing_ship = ship
         self.type = WEAPON.PHASER
         self.projectile_group = projectile_group
         surf = Surface([100, 1]).convert_alpha()
