@@ -8,8 +8,8 @@ from game.base import SpaceEntity
 from game.conf import (
     CHECK_KEYS_TIME_DELAY_MS,
     MAX_TORPEDOES_PER_SHIP,
-    WEAPON,
-    WEAPON_FIRE_TIME_DEPLAY_MS,
+    PHASER_FIRE_TIME_DELAY_MS,
+    TORPEDO_FIRE_TIME_DELAY_MS,
 )
 from game.projectile import Phaser, PhotonTorpedo
 
@@ -87,7 +87,7 @@ class HumanShip(SpaceEntity):
                     self.projectile_group.add(self.phaser)
                     pygame.time.set_timer(
                         self.check_fire_phaser_event,
-                        300,
+                        PHASER_FIRE_TIME_DELAY_MS,
                     )
             if event.key == pygame.constants.K_e:
                 if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
@@ -101,7 +101,7 @@ class HumanShip(SpaceEntity):
                     )
                     pygame.time.set_timer(
                         self.check_fire_torpedoes_event,
-                        WEAPON_FIRE_TIME_DEPLAY_MS,
+                        TORPEDO_FIRE_TIME_DELAY_MS,
                     )
         if event.type == pygame.KEYUP:
             if event.key == pygame.constants.K_a:

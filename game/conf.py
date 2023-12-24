@@ -14,7 +14,9 @@ SCREEN_HEIGHT = 600
 # The delay in ms to check user input
 CHECK_KEYS_TIME_DELAY_MS = 100
 # The delay in ms to check firing weapons
-WEAPON_FIRE_TIME_DEPLAY_MS = 150
+PHASER_FIRE_TIME_DELAY_MS = 300
+PHASER_MAX_FLIGHT_MS = 100
+TORPEDO_FIRE_TIME_DELAY_MS = 150
 # The max time in ms a torpedo is allowed to fly for
 TORPEDO_MAX_FLIGHT_MS = 10000
 TORPEDO_SPEED = 4.5

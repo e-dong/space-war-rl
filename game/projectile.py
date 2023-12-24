@@ -49,12 +49,12 @@ class Phaser(SpaceEntity):
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         flight_time = pygame.time.get_ticks() - self.start_time
-        if flight_time > 100:
+        if flight_time > PHASER_MAX_FLIGHT_MS:
             self.projectile_group.remove(self)
 
     def check_active(self):
         flight_time = pygame.time.get_ticks() - self.start_time
-        if flight_time > 300:
+        if flight_time > PHASER_FIRE_TIME_DELAY_MS:
             return False
         return True
 
