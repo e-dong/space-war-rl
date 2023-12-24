@@ -6,7 +6,15 @@ from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
 from game.ship import HumanShip
 
-# TODO: Refactor collision logic in main
+
+def render_player(player, player_group, player_target_group, surface):
+    player_group.draw(surface)
+    player.phaser_group.draw(surface)
+    player.torpedo_group.draw(surface)
+
+    player_group.update(player_target_group)
+    player.phaser_group.update(player_target_group)
+    player.torpedo_group.update(player_target_group)
 
 
 def main():
@@ -17,7 +25,6 @@ def main():
     clock = pygame.time.Clock()
 
     # Groups
-    projectile_group = pygame.sprite.Group()
     player_one = HumanShip(
         image_path=module_path() / "assets" / "player_one.png",
         start_pos=(
@@ -25,7 +32,6 @@ def main():
             screen.get_height() / 4,
         ),
         start_ang=0,
-        projectile_group=projectile_group,
     )
     player_two = HumanShip(
         image_path=module_path() / "assets" / "player_one.png",
@@ -34,13 +40,20 @@ def main():
             screen.get_height() - screen.get_height() / 4,
         ),
         start_ang=180,
-        projectile_group=projectile_group,
     )
+
     player_one_group = pygame.sprite.GroupSingle()
     player_one_group.add(player_one)
 
     player_two_group = pygame.sprite.GroupSingle()
     player_two_group.add(player_two)
+
+    player_one_targets = pygame.sprite.Group()
+    player_one_targets.add(player_one, player_two)
+    player_two_targets = pygame.sprite.Group()
+    player_two_targets.add(player_one, player_two)
+    torpedo_group = pygame.sprite.Group()
+    phaser_group = pygame.sprite.Group()
 
     running = True
 
@@ -55,15 +68,17 @@ def main():
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
 
-        # draw sprites to screen and update display
-        player_one_group.draw(screen)
-        player_two_group.draw(screen)
-        player_one.projectile_group.draw(screen)
-        player_one_group.update()
-        player_one.projectile_group.update()
-        player_two_group.update()
-        pygame.display.update()
+        # Update torpedo group membership
+        torpedo_group.add(player_one.torpedo_group, player_two.torpedo_group)
+        phaser_group.add(player_one.phaser_group, player_two.phaser_group)
+        player_one_targets.add(torpedo_group)
+        player_two_targets.add(torpedo_group)
 
+        # draw sprites to screen and update
+        render_player(player_one, player_one_group, player_one_targets, screen)
+        render_player(player_two, player_two_group, player_two_targets, screen)
+
+        pygame.display.update()
         clock.tick(MAX_FPS)
 
     pygame.quit()

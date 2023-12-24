@@ -19,7 +19,7 @@ from game.projectile import Phaser, PhotonTorpedo
 class HumanShip(SpaceEntity):
     """Represents the ship controlled by a human player"""
 
-    projectile_group: pygame.sprite.Group
+    torpedo_group: pygame.sprite.Group
     rotate_ccw_lock: bool
     check_rotate_cc_repeat_event: pygame.USEREVENT
     check_rotate_cw_repeat_event: pygame.USEREVENT
@@ -27,16 +27,13 @@ class HumanShip(SpaceEntity):
     check_fire_torpedoes_event: pygame.USEREVENT
 
     def __init__(
-        self,
-        image_path: Path,
-        start_pos: tuple[int, int],
-        start_ang: float,
-        projectile_group: pygame.sprite.Group,
+        self, image_path: Path, start_pos: tuple[int, int], start_ang: float
     ) -> None:
         super().__init__(
             pygame.image.load(image_path).convert_alpha(), start_pos, start_ang
         )
-        self.projectile_group = projectile_group
+        self.torpedo_group = pygame.sprite.Group()
+        self.phaser_group = pygame.sprite.GroupSingle()
         self.phaser = None
         self.rotate_ccw_lock = False
 
@@ -52,6 +49,8 @@ class HumanShip(SpaceEntity):
         state. This method should be called from the event loop to pass the
         event object.
         """
+        if not self.alive():
+            return
         if event.type == pygame.KEYDOWN:
             # Handle ship movement and rotation
             if event.key == pygame.constants.K_a:
@@ -78,25 +77,23 @@ class HumanShip(SpaceEntity):
             if event.key == pygame.constants.K_q:
                 if not self.phaser or not self.phaser.check_active():
                     self.phaser = Phaser(
-                        ship=self,
+                        source_ship=self,
                         start_pos=self.pos,
                         start_vel=self.vel,
                         start_ang=self.ang,
-                        projectile_group=self.projectile_group,
                     )
-                    self.projectile_group.add(self.phaser)
+                    self.phaser_group.add(self.phaser)
                     pygame.time.set_timer(
                         self.check_fire_phaser_event,
                         PHASER_FIRE_TIME_DELAY_MS,
                     )
             if event.key == pygame.constants.K_e:
-                if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
-                    self.projectile_group.add(
+                if len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP:
+                    self.torpedo_group.add(
                         PhotonTorpedo(
                             start_pos=self.pos,
                             start_ang=self.ang,
                             start_vel=self.vel,
-                            projectile_group=self.projectile_group,
                         )
                     )
                     pygame.time.set_timer(
@@ -133,36 +130,18 @@ class HumanShip(SpaceEntity):
             self.vel = (x_vel, y_vel)
         if event.type == self.check_fire_phaser_event:
             self.phaser = Phaser(
-                ship=self,
+                source_ship=self,
                 start_pos=self.pos,
                 start_vel=self.vel,
                 start_ang=self.ang,
-                projectile_group=self.projectile_group,
             )
-            self.projectile_group.add(self.phaser)
+            self.phaser_group.add(self.phaser)
         if event.type == self.check_fire_torpedoes_event:
-            if len(self.projectile_group) < MAX_TORPEDOES_PER_SHIP:
-                self.projectile_group.add(
+            if len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP:
+                self.torpedo_group.add(
                     PhotonTorpedo(
                         start_pos=self.pos,
                         start_ang=self.ang,
                         start_vel=self.vel,
-                        projectile_group=self.projectile_group,
                     )
                 )
-
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        # TODO: apply damage to the ship for every collision
-        for sprite in self.projectile_group.sprites():
-            if (
-                self.rect.colliderect(sprite.rect)
-                and sprite.type == WEAPON.TORPEDO
-            ):
-                self.projectile_group.remove(sprite)
-            if (
-                self.rect.colliderect(sprite.rect)
-                and sprite.type == WEAPON.PHASER
-                and sprite.firing_ship != self
-            ):
-                pass
