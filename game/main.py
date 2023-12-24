@@ -33,6 +33,9 @@ def main():
         ),
         start_ang=0,
     )
+
+    # TODO: Create pixel art for player two
+    # player two is just a dummy target that doesn't move nor shoot for now
     player_two = HumanShip(
         image_path=module_path() / "assets" / "player_one.png",
         start_pos=(
