@@ -13,9 +13,14 @@ from game.conf import (
 )
 from game.projectile import Phaser, PhotonTorpedo
 
-
 # TODO: Create a bass class for ship,
 # refactor the interaction logic into "actions"
+
+# TODO: Refactor weapon cooldown period in ship instead of in projectile class
+# Currently torpedoes does not have a cooldown, shoots as fast as your press E
+# Phasers are implemented via the Phaser.check_active function
+
+
 class HumanShip(SpaceEntity):
     """Represents the ship controlled by a human player"""
 
