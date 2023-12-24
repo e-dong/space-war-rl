@@ -53,7 +53,6 @@ def main():
     player_two_targets = pygame.sprite.Group()
     player_two_targets.add(player_one, player_two)
     torpedo_group = pygame.sprite.Group()
-    phaser_group = pygame.sprite.Group()
 
     running = True
 
@@ -70,7 +69,6 @@ def main():
 
         # Update torpedo group membership
         torpedo_group.add(player_one.torpedo_group, player_two.torpedo_group)
-        phaser_group.add(player_one.phaser_group, player_two.phaser_group)
         player_one_targets.add(torpedo_group)
         player_two_targets.add(torpedo_group)
 
