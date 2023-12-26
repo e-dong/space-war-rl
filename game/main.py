@@ -1,5 +1,9 @@
 """Contains the main entrypoint logic"""
 
+# TODO: Use dummy display for training headless
+# import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 import pygame
 
 from game import module_path
