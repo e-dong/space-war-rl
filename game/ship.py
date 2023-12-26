@@ -8,6 +8,7 @@ from game.base import SpaceEntity
 from game.conf import (
     CHECK_KEYS_TIME_DELAY_MS,
     MAX_TORPEDOES_PER_SHIP,
+    MOVEMENT_TIME_DELAY_MS,
     PHASER_FIRE_TIME_DELAY_MS,
     TORPEDO_FIRE_TIME_DELAY_MS,
 )
@@ -62,14 +63,14 @@ class HumanShip(SpaceEntity):
                 self.rotate_ccw_lock = True
                 self.ang -= 22.5
                 pygame.time.set_timer(
-                    self.check_rotate_cc_repeat_event, CHECK_KEYS_TIME_DELAY_MS
+                    self.rotate_cc_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
 
             if event.key == pygame.constants.K_d:
                 self.rotate_ccw_lock = False
                 self.ang += 22.5
                 pygame.time.set_timer(
-                    self.check_rotate_cw_repeat_event, CHECK_KEYS_TIME_DELAY_MS
+                    self.rotate_cw_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
             if event.key == pygame.constants.K_s:
                 x_vel, y_vel = self.vel
@@ -77,7 +78,7 @@ class HumanShip(SpaceEntity):
                 y_vel += math.sin(self.ang * math.pi / 180)
                 self.vel = (x_vel, y_vel)
                 pygame.time.set_timer(
-                    self.check_acc_repeat_event, CHECK_KEYS_TIME_DELAY_MS
+                    self.acc_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
             if event.key == pygame.constants.K_q:
                 if not self.phaser or not self.phaser.check_active():

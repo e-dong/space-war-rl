@@ -11,8 +11,8 @@ MAX_FPS = 60
 # screen dimensions for pygame window
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-# The delay in ms to check user input
-CHECK_KEYS_TIME_DELAY_MS = 100
+# The delay in ms to check user movement (e.g. acceleration and rotation)
+MOVEMENT_TIME_DELAY_MS = 100
 # The delay in ms to check firing weapons
 PHASER_FIRE_TIME_DELAY_MS = 300
 PHASER_MAX_FLIGHT_MS = 100
