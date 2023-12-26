@@ -1,9 +1,24 @@
-"""Constants / Confguration for game"""
+"""Constants / Configuration for game"""
 from enum import Enum
+from typing import TypedDict
+
+import pygame
 
 
 class WEAPON(Enum):
+    """Simple enum to determine the weapon type"""
+
     TORPEDO, PHASER = range(2)
+
+
+SpriteConfig = TypedDict(
+    "SpriteConfig",
+    {
+        "id": str,
+        "sprite": pygame.sprite.Sprite,
+        "group": pygame.sprite.Group,
+    },
+)
 
 
 # limits FPS to 60
@@ -16,6 +31,8 @@ MOVEMENT_TIME_DELAY_MS = 100
 # The delay in ms to check firing weapons
 PHASER_FIRE_TIME_DELAY_MS = 300
 PHASER_MAX_FLIGHT_MS = 100
+PHASER_LENGTH = 100
+PHASER_WIDTH = 1
 TORPEDO_FIRE_TIME_DELAY_MS = 150
 # The max time in ms a torpedo is allowed to fly for
 TORPEDO_MAX_FLIGHT_MS = 10000

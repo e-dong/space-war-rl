@@ -21,11 +21,12 @@ from game.projectile import Phaser, PhotonTorpedo
 
 
 class BaseShip(SpaceEntity):
+    """Defines common ship functionality"""
+
     player_id: int
     torpedo_group: pygame.sprite.Group
     phaser_group: pygame.sprite.GroupSingle
     phaser: pygame.sprite.Sprite
-    rotate_ccw_lock: bool
 
     def __init__(
         self,
@@ -43,17 +44,21 @@ class BaseShip(SpaceEntity):
         self.phaser_group = pygame.sprite.GroupSingle()
         self.phaser = None
 
-    def draw_groups(self, surface):
+    def draw_groups(self, surface: pygame.Surface):
+        """Draws the torpedo and phaser group to the surface"""
         self.torpedo_group.draw(surface)
         self.phaser_group.draw(surface)
 
-    def update_groups(self, target_group):
-        self.torpedo_group.update(target_group)
-        self.phaser_group.update(target_group)
+    def update_groups(self, target_group: pygame.sprite.Group):
+        """Calls update on the torpedo and phaser group"""
+        self.torpedo_group.update(target_group=target_group)
+        self.phaser_group.update(target_group=target_group)
 
 
 class HumanShip(BaseShip):
-    """Represents the ship controlled by a human player"""
+    """Represents the ship controlled by a human player.
+    User input is captured using the event loop in handle_events.
+    """
 
     rotate_cc_repeat_event: pygame.USEREVENT
     rotate_cw_repeat_event: pygame.USEREVENT
@@ -80,8 +85,9 @@ class HumanShip(BaseShip):
         self.fire_phaser_repeat_event = pygame.USEREVENT + player_id + 5
 
     def handle_events(self, event: pygame.event.Event):
-        """Handles keyboard input to update ship's rotation and position
-        state. This method should be called from the event loop to pass the
+        """Handles keyboard input to update movement and fire weapons.
+
+        This method should be called from the event loop to pass the
         event object.
         """
         if not self.alive():

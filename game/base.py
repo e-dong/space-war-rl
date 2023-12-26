@@ -36,7 +36,7 @@ class SpaceEntity(pygame.sprite.Sprite):
         self.vel = start_vel
         self.ang = start_ang
 
-    def update(self, *args, **kwargs):
+    def update(self, *_args, **_kwargs):
         """Entrypoint for updating the player state each frame"""
         x_pos, y_pos = self.pos
         x_vel, y_vel = self.vel

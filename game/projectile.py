@@ -8,65 +8,95 @@ from pygame import Surface
 from game.base import SpaceEntity
 from game.conf import (
     PHASER_FIRE_TIME_DELAY_MS,
+    PHASER_LENGTH,
     PHASER_MAX_FLIGHT_MS,
+    PHASER_WIDTH,
     TORPEDO_MAX_FLIGHT_MS,
     TORPEDO_SPEED,
     WEAPON,
 )
+from game.ship import BaseShip
 
 
 class Phaser(SpaceEntity):
+    """The phaser weapon, fires a straight line up to a fixed distance"""
+
+    source_ship: BaseShip
+    type: WEAPON.PHASER
+    active: bool
+    start_time: int
+    ship_pos: tuple[float, float]
+
     def __init__(self, source_ship, start_pos, start_ang, start_vel) -> None:
         self.source_ship = source_ship
         self.type = WEAPON.PHASER
-        surf = Surface([100, 1]).convert_alpha()
+        surf = Surface([PHASER_LENGTH, PHASER_WIDTH]).convert_alpha()
         super().__init__(surf, start_pos, start_ang, start_vel)
         self.start_time = pygame.time.get_ticks()
         self.active = True
         # Update rotation to surface
         self.ang %= 360
         self.ship_pos = start_pos
-        phaser_x_pos = self.pos[0] + 50 * math.cos(self.ang * math.pi / 180)
-        phaser_y_pos = self.pos[1] + 50 * math.sin(self.ang * math.pi / 180)
+
+        # Translate the phaser due to rotation to center
+        phaser_x_pos = self.pos[0] + (PHASER_LENGTH / 2) * math.cos(
+            self.ang * math.pi / 180
+        )
+        phaser_y_pos = self.pos[1] + (PHASER_LENGTH / 2) * math.sin(
+            self.ang * math.pi / 180
+        )
 
         self.pos = (phaser_x_pos, phaser_y_pos)
         surf = pygame.transform.rotate(self.surf, -self.ang)
         self.rect = surf.get_rect(center=self.pos)
 
-    def draw_laser(self, target_group: pygame.sprite.AbstractGroup, end_x=99):
-        # Draw a line to represent phaser
+    def draw_laser(
+        self, target_group: pygame.sprite.Group, end_x=PHASER_LENGTH - 1
+    ):
+        """Draws the non-piercing laser and handle collisions with sprites
+        within target group.
+
+          - Collisions with the rectangle will result in drawing a line to the
+            center of the sprite in the target group.
+          - If there are multiple collisions, only consider the closest one.
+          - If there are no collisions, draw the full length of the laser.
+        """
+
         if self.active:
             idx_to_kill = None
             idx = 0
-            target_sprites = pygame.sprite.spritecollide(self, target_group, 0)
-            for projectile in target_sprites:
+            collided_sprites = pygame.sprite.spritecollide(
+                self, target_group, 0
+            )
+            for sprite in collided_sprites:
                 if (
-                    projectile != self
-                    and projectile != self.source_ship
-                    and self.rect.colliderect(projectile.rect)
+                    sprite != self
+                    and sprite != self.source_ship
+                    and self.rect.colliderect(sprite.rect)
                 ):
-                    dist = math.dist(self.ship_pos, (projectile.rect.center))
+                    dist = math.dist(self.ship_pos, (sprite.rect.center))
                     if dist < end_x:
                         end_x = dist
                         idx_to_kill = idx
 
                 idx += 1
             if idx_to_kill is not None:
-                target_sprites[idx_to_kill].kill()
+                collided_sprites[idx_to_kill].kill()
             pygame.draw.line(
                 self.image, "white", start_pos=(0, 0), end_pos=(end_x, 0)
             )
             self.active = False
 
-    def update(self, target_group, *args, **kwargs):
-        self.draw_laser(target_group)
+    def update(self, *args, **kwargs):
+        self.draw_laser(kwargs["target_group"])
         super().update(*args, **kwargs)
 
         flight_time = pygame.time.get_ticks() - self.start_time
         if flight_time > PHASER_MAX_FLIGHT_MS:
             self.kill()
 
-    def check_active(self):
+    def check_active(self) -> bool:
+        """Checks if the phaser is actively being fired"""
         flight_time = pygame.time.get_ticks() - self.start_time
         if flight_time > PHASER_FIRE_TIME_DELAY_MS:
             return False
@@ -75,6 +105,9 @@ class Phaser(SpaceEntity):
 
 class PhotonTorpedo(SpaceEntity):
     """Represents the photon torpedo object that a ship can fire"""
+
+    type: WEAPON.TORPEDO
+    start_time: int
 
     def __init__(self, start_pos, start_ang, start_vel) -> None:
         self.type = WEAPON.TORPEDO
@@ -100,7 +133,7 @@ class PhotonTorpedo(SpaceEntity):
 
         self.start_time = pygame.time.get_ticks()
 
-    def update(self, target_group, *args, **kwargs):
+    def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         # Torpedo needs to be rotated an additional 90 degrees
         # due to the orientation it was originally drawn
@@ -111,7 +144,7 @@ class PhotonTorpedo(SpaceEntity):
         if flight_time > TORPEDO_MAX_FLIGHT_MS:
             self.kill()
 
-        for projectile in target_group.sprites():
-            if projectile != self and self.rect.colliderect(projectile.rect):
-                projectile.kill()
+        for sprite in kwargs["target_group"].sprites():
+            if sprite != self and self.rect.colliderect(sprite.rect):
+                sprite.kill()
                 self.kill()

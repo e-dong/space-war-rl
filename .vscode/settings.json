@@ -22,6 +22,8 @@
     "arange",
     "centerx",
     "centery",
+    "colliderect",
+    "cooldown",
     "DDPG",
     "Dota",
     "elif",
@@ -37,6 +39,8 @@
     "pygame",
     "reinforcementlearning",
     "spacewar",
-    "USEREVENT"
+    "spritecollide",
+    "USEREVENT",
+    "VIDEODRIVER"
   ]
 }
