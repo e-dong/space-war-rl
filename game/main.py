@@ -8,17 +8,36 @@ import pygame
 
 from game import module_path
 from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH
-from game.ship import HumanShip
+from game.ship import BaseShip, HumanShip
 
 
-def render_player(player, player_group, player_target_group, surface):
-    player_group.draw(surface)
-    player.phaser_group.draw(surface)
-    player.torpedo_group.draw(surface)
+def render_player(player_cfg, player_target_group, surface):
+    for player in player_cfg:
+        player["group"].draw(surface)
+        player["sprite"].draw_groups(surface)
 
-    player_group.update(player_target_group)
-    player.phaser_group.update(player_target_group)
-    player.torpedo_group.update(player_target_group)
+        player["group"].update(player_target_group)
+        player["sprite"].update_groups(player_target_group)
+
+
+def get_player_sprites_from_pos(pos_iter, instance_iter):
+    sprite_cfg = []
+    sprites = []
+    for player_id, pos in enumerate(pos_iter):
+        player_group = pygame.sprite.GroupSingle()
+        player_sprite = instance_iter[player_id](
+            player_id=player_id,
+            image_path=module_path() / "assets" / f"player_{player_id}.png",
+            start_pos=pos,
+            start_ang=0,
+        )
+
+        player_group.add(player_sprite)
+        sprites.append(player_sprite)
+        sprite_cfg.append(
+            {"id": player_id, "sprite": player_sprite, "group": player_group}
+        )
+    return sprites, sprite_cfg
 
 
 def main():
@@ -28,45 +47,33 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
-    # Groups
-    player_one = HumanShip(
-        image_path=module_path() / "assets" / "player_one.png",
-        start_pos=(
-            screen.get_width() / 4,
-            screen.get_height() / 4,
-        ),
-        start_ang=0,
+    # TODO: hydra will make this cleaner
+    player_sprites, cfg = get_player_sprites_from_pos(
+        instance_iter=[HumanShip, BaseShip],
+        pos_iter=[
+            (
+                screen.get_width() / 4,
+                screen.get_height() / 4,
+            ),
+            (
+                screen.get_width() - screen.get_width() / 4,
+                screen.get_height() - screen.get_height() / 4,
+            ),
+        ],
     )
 
-    # TODO: Create pixel art for player two
-    # player two is just a dummy target that doesn't move nor shoot for now
-    player_two = HumanShip(
-        image_path=module_path() / "assets" / "player_one.png",
-        start_pos=(
-            screen.get_width() - screen.get_width() / 4,
-            screen.get_height() - screen.get_height() / 4,
-        ),
-        start_ang=180,
-    )
-
-    player_one_group = pygame.sprite.GroupSingle()
-    player_one_group.add(player_one)
-
-    player_two_group = pygame.sprite.GroupSingle()
-    player_two_group.add(player_two)
-
-    player_one_targets = pygame.sprite.Group()
-    player_one_targets.add(player_one, player_two)
-    player_two_targets = pygame.sprite.Group()
-    player_two_targets.add(player_one, player_two)
     torpedo_group = pygame.sprite.Group()
+    player_target_group = pygame.sprite.Group()
+    player_target_group.add(player_sprites)
 
     running = True
 
     while running:
         # event loop
         for event in pygame.event.get():
-            player_one.handle_events(event)
+            for player in player_sprites:
+                if isinstance(player, HumanShip):
+                    player.handle_events(event)
             # pygame.QUIT event means the user clicked X to close your window
             if event.type == pygame.QUIT:
                 running = False
@@ -75,13 +82,11 @@ def main():
         screen.fill("black")
 
         # Update torpedo group membership
-        torpedo_group.add(player_one.torpedo_group, player_two.torpedo_group)
-        player_one_targets.add(torpedo_group)
-        player_two_targets.add(torpedo_group)
+        torpedo_group.add([player.torpedo_group for player in player_sprites])
+        player_target_group.add(torpedo_group)
 
         # draw sprites to screen and update
-        render_player(player_one, player_one_group, player_one_targets, screen)
-        render_player(player_two, player_two_group, player_two_targets, screen)
+        render_player(cfg, player_target_group, screen)
 
         pygame.display.update()
         clock.tick(MAX_FPS)
