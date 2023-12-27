@@ -10,6 +10,7 @@ from game.conf import (
     MOVEMENT_TIME_DELAY_MS,
     PHASER_FIRE_CD,
     TORPEDO_FIRE_CD,
+    SpaceEntityType,
 )
 from game.projectile import Phaser, PhotonTorpedo
 
@@ -33,7 +34,10 @@ class BaseShip(SpaceEntity):
         start_ang: float,
     ) -> None:
         super().__init__(
-            pygame.image.load(image_path).convert_alpha(), start_pos, start_ang
+            SpaceEntityType.SHIP,
+            pygame.image.load(image_path).convert_alpha(),
+            start_pos,
+            start_ang,
         )
 
         self.player_id = player_id
@@ -42,6 +46,7 @@ class BaseShip(SpaceEntity):
         self.phaser = None
         self.phaser_last_fired = None
         self.torpedo_last_fired = None
+        self.last_collided_ship = None
 
     def draw_groups(self, surface: pygame.Surface):
         """Draws the torpedo and phaser group to the surface"""
@@ -64,6 +69,13 @@ class BaseShip(SpaceEntity):
         """Checks if the phaser is actively being fired"""
         flight_time = pygame.time.get_ticks() - self.torpedo_last_fired
         if flight_time > TORPEDO_FIRE_CD:
+            return False
+        return True
+
+    def check_ship_collision(self) -> bool:
+        """Checks if the phaser is actively being fired"""
+        flight_time = pygame.time.get_ticks() - self.last_collided_ship
+        if flight_time > 100:
             return False
         return True
 
@@ -219,3 +231,27 @@ class HumanShip(BaseShip):
 
         self._handle_movement_events(event)
         self._handle_firing_weapon_events(event)
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        for sprite in kwargs["target_group"].sprites():
+            if (
+                sprite != self
+                and self.rect.colliderect(sprite.rect)
+                and sprite.entity_type == SpaceEntityType.SHIP
+            ):
+                if (
+                    not self.last_collided_ship
+                    or not self.check_ship_collision()
+                ):
+                    self_vel_x, self_vel_y = self.vel
+                    other_vel_x, other_vel_y = sprite.vel
+
+                    new_self_vel_x = (self_vel_x * 0.25) + (other_vel_x * 0.75)
+                    new_self_vel_y = (self_vel_y * 0.25) + (other_vel_y * 0.75)
+                    new_other_vel_x = (other_vel_x * 0.25) + (self_vel_x * 0.75)
+                    new_other_vel_y = (other_vel_y * 0.25) + (self_vel_y * 0.75)
+
+                    self.vel = (new_self_vel_x, new_self_vel_y)
+                    sprite.vel = (new_other_vel_x, new_other_vel_y)
+                    self.last_collided_ship = pygame.time.get_ticks()

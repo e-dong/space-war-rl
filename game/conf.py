@@ -5,10 +5,10 @@ from typing import TypedDict
 import pygame
 
 
-class WEAPON(Enum):
+class SpaceEntityType(Enum):
     """Simple enum to determine the weapon type"""
 
-    TORPEDO, PHASER = range(2)
+    SHIP, TORPEDO, PHASER = range(3)
 
 
 SpriteConfig = TypedDict(

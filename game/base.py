@@ -7,8 +7,10 @@ from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class SpaceEntity(pygame.sprite.Sprite):
-    """A base class for objects that move in space,
-    like ships and projectiles. State is manged internally.
+    """A base class for objects that move in space, like ships and projectiles.
+
+    Features screen wrap-around, frictionless/zero gravity physics, and
+    rotation. Subclasses should implement collision handling.
 
     Attributes:
         surf: The reference to the original Surface, used for rotation
@@ -20,6 +22,7 @@ class SpaceEntity(pygame.sprite.Sprite):
         ang: The angle in degrees representing the direction the ship is facing
     """
 
+    entity_type: int
     surf: pygame.surface.Surface
     image: pygame.surface.Surface
     pos: tuple[int, int]
@@ -27,8 +30,11 @@ class SpaceEntity(pygame.sprite.Sprite):
     vel: tuple[float, float]
     ang: float
 
-    def __init__(self, surf, start_pos, start_ang=0, start_vel=(0, 0)) -> None:
+    def __init__(
+        self, entity_type, surf, start_pos, start_ang=0, start_vel=(0, 0)
+    ) -> None:
         super().__init__()
+        self.entity_type = entity_type
         self.surf = surf
         self.image = surf
         self.pos = start_pos

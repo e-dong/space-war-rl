@@ -12,7 +12,7 @@ from game.conf import (
     PHASER_WIDTH,
     TORPEDO_MAX_FLIGHT_MS,
     TORPEDO_SPEED,
-    WEAPON,
+    SpaceEntityType,
 )
 
 
@@ -20,16 +20,16 @@ class Phaser(SpaceEntity):
     """The phaser weapon, fires a straight line up to a fixed distance"""
 
     source_ship: pygame.sprite.Sprite
-    type: WEAPON.PHASER
     active: bool
     start_time: int
     ship_pos: tuple[float, float]
 
     def __init__(self, source_ship, start_pos, start_ang, start_vel) -> None:
         self.source_ship = source_ship
-        self.type = WEAPON.PHASER
         surf = Surface([PHASER_LENGTH, PHASER_WIDTH]).convert_alpha()
-        super().__init__(surf, start_pos, start_ang, start_vel)
+        super().__init__(
+            SpaceEntityType.PHASER, surf, start_pos, start_ang, start_vel
+        )
         self.start_time = pygame.time.get_ticks()
         self.active = True
         # Update rotation to surface
@@ -97,16 +97,18 @@ class Phaser(SpaceEntity):
 class PhotonTorpedo(SpaceEntity):
     """Represents the photon torpedo object that a ship can fire"""
 
-    type: WEAPON.TORPEDO
     start_time: int
 
     def __init__(self, start_pos, start_ang, start_vel) -> None:
-        self.type = WEAPON.TORPEDO
         surf = Surface([12, 12]).convert_alpha()
         torpedo_x_pos = start_pos[0] + 36 * math.cos(start_ang * math.pi / 180)
         torpedo_y_pos = start_pos[1] + 36 * math.sin(start_ang * math.pi / 180)
         super().__init__(
-            surf, (torpedo_x_pos, torpedo_y_pos), start_ang, start_vel
+            SpaceEntityType.TORPEDO,
+            surf,
+            (torpedo_x_pos, torpedo_y_pos),
+            start_ang,
+            start_vel,
         )
 
         # Draw on the surface of what the torpedo looks like
