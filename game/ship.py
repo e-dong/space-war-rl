@@ -8,16 +8,13 @@ from game.base import SpaceEntity
 from game.conf import (
     MAX_TORPEDOES_PER_SHIP,
     MOVEMENT_TIME_DELAY_MS,
-    PHASER_FIRE_TIME_DELAY_MS,
-    TORPEDO_FIRE_TIME_DELAY_MS,
+    PHASER_FIRE_CD,
+    TORPEDO_FIRE_CD,
 )
 from game.projectile import Phaser, PhotonTorpedo
 
 # TODO: refactor the interaction logic into "actions"
-
-# TODO: Refactor weapon cooldown period in ship instead of in projectile class
-# Currently torpedoes does not have a cooldown, shoots as fast as your press E
-# Phasers are implemented via the Phaser.check_active function
+# The human ship would call these action functions in handle_events
 
 
 class BaseShip(SpaceEntity):
@@ -43,6 +40,8 @@ class BaseShip(SpaceEntity):
         self.torpedo_group = pygame.sprite.Group()
         self.phaser_group = pygame.sprite.GroupSingle()
         self.phaser = None
+        self.phaser_last_fired = None
+        self.torpedo_last_fired = None
 
     def draw_groups(self, surface: pygame.Surface):
         """Draws the torpedo and phaser group to the surface"""
@@ -53,6 +52,20 @@ class BaseShip(SpaceEntity):
         """Calls update on the torpedo and phaser group"""
         self.torpedo_group.update(target_group=target_group)
         self.phaser_group.update(target_group=target_group)
+
+    def check_phaser_cooldown(self) -> bool:
+        """Checks if the phaser is actively being fired"""
+        flight_time = pygame.time.get_ticks() - self.phaser_last_fired
+        if flight_time > PHASER_FIRE_CD:
+            return False
+        return True
+
+    def check_torpedo_cooldown(self) -> bool:
+        """Checks if the phaser is actively being fired"""
+        flight_time = pygame.time.get_ticks() - self.torpedo_last_fired
+        if flight_time > TORPEDO_FIRE_CD:
+            return False
+        return True
 
 
 class HumanShip(BaseShip):
@@ -116,7 +129,14 @@ class HumanShip(BaseShip):
                     self.acc_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
             if event.key == pygame.constants.K_q:
-                if not self.phaser or not self.phaser.check_active():
+                pygame.time.set_timer(
+                    self.fire_phaser_repeat_event,
+                    PHASER_FIRE_CD,
+                )
+                if (
+                    not self.phaser_last_fired
+                    or not self.check_phaser_cooldown()
+                ):
                     self.phaser = Phaser(
                         source_ship=self,
                         start_pos=self.pos,
@@ -124,11 +144,13 @@ class HumanShip(BaseShip):
                         start_ang=self.ang,
                     )
                     self.phaser_group.add(self.phaser)
-                    pygame.time.set_timer(
-                        self.fire_phaser_repeat_event,
-                        PHASER_FIRE_TIME_DELAY_MS,
-                    )
+                    self.phaser_last_fired = pygame.time.get_ticks()
+
             if event.key == pygame.constants.K_e:
+                pygame.time.set_timer(
+                    self.fire_torpedoes_repeat_event,
+                    TORPEDO_FIRE_CD,
+                )
                 if len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP:
                     self.torpedo_group.add(
                         PhotonTorpedo(
@@ -137,10 +159,8 @@ class HumanShip(BaseShip):
                             start_vel=self.vel,
                         )
                     )
-                    pygame.time.set_timer(
-                        self.fire_torpedoes_repeat_event,
-                        TORPEDO_FIRE_TIME_DELAY_MS,
-                    )
+                    self.torpedo_last_fired = pygame.time.get_ticks()
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.constants.K_a:
                 self.rotate_ccw_lock = False
@@ -176,9 +196,11 @@ class HumanShip(BaseShip):
                 start_vel=self.vel,
                 start_ang=self.ang,
             )
+            self.phaser_last_fired = pygame.time.get_ticks()
             self.phaser_group.add(self.phaser)
         if event.type == self.fire_torpedoes_repeat_event:
             if len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP:
+                self.torpedo_last_fired = pygame.time.get_ticks()
                 self.torpedo_group.add(
                     PhotonTorpedo(
                         start_pos=self.pos,

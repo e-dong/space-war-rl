@@ -28,12 +28,13 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 # The delay in ms to check user movement (e.g. acceleration and rotation)
 MOVEMENT_TIME_DELAY_MS = 100
-# The delay in ms to check firing weapons
-PHASER_FIRE_TIME_DELAY_MS = 300
+# The cooldown period before firing phasers again
+PHASER_FIRE_CD = 300
 PHASER_MAX_FLIGHT_MS = 100
 PHASER_LENGTH = 100
 PHASER_WIDTH = 1
-TORPEDO_FIRE_TIME_DELAY_MS = 150
+# The cooldown period before firing torpedoes again
+TORPEDO_FIRE_CD = 150
 # The max time in ms a torpedo is allowed to fly for
 TORPEDO_MAX_FLIGHT_MS = 10000
 TORPEDO_SPEED = 4.5

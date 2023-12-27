@@ -7,7 +7,6 @@ from pygame import Surface
 
 from game.base import SpaceEntity
 from game.conf import (
-    PHASER_FIRE_TIME_DELAY_MS,
     PHASER_LENGTH,
     PHASER_MAX_FLIGHT_MS,
     PHASER_WIDTH,
@@ -15,13 +14,12 @@ from game.conf import (
     TORPEDO_SPEED,
     WEAPON,
 )
-from game.ship import BaseShip
 
 
 class Phaser(SpaceEntity):
     """The phaser weapon, fires a straight line up to a fixed distance"""
 
-    source_ship: BaseShip
+    source_ship: pygame.sprite.Sprite
     type: WEAPON.PHASER
     active: bool
     start_time: int
@@ -94,13 +92,6 @@ class Phaser(SpaceEntity):
         flight_time = pygame.time.get_ticks() - self.start_time
         if flight_time > PHASER_MAX_FLIGHT_MS:
             self.kill()
-
-    def check_active(self) -> bool:
-        """Checks if the phaser is actively being fired"""
-        flight_time = pygame.time.get_ticks() - self.start_time
-        if flight_time > PHASER_FIRE_TIME_DELAY_MS:
-            return False
-        return True
 
 
 class PhotonTorpedo(SpaceEntity):
