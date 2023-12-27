@@ -21,7 +21,9 @@ def render_sprites(sprite_cfg, player_target_group, surface):
 
 
 def get_player_sprites(
-    pos_iter: list[tuple[int, int]], instance_iter: list[BaseShip]
+    pos_iter: list[tuple[int, int]],
+    ang_iter: list[int],
+    instance_iter: list[BaseShip],
 ) -> tuple[list[BaseShip], list[SpriteConfig]]:
     """Initialize player sprites and returns a list of sprites and
     configuration
@@ -33,7 +35,7 @@ def get_player_sprites(
             player_id=player_id,
             image_path=module_path() / "assets" / f"player_{player_id}.png",
             start_pos=pos_iter[player_id],
-            start_ang=0,
+            start_ang=ang_iter[player_id],
         )
         player_group = pygame.sprite.GroupSingle()
         player_group.add(player_sprite)
@@ -64,6 +66,7 @@ def main():
                 screen.get_height() - screen.get_height() / 4,
             ),
         ],
+        ang_iter=[0, 180],
     )
 
     torpedo_group = pygame.sprite.Group()
