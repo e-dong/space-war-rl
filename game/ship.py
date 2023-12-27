@@ -97,16 +97,9 @@ class HumanShip(BaseShip):
         self.fire_torpedoes_repeat_event = pygame.USEREVENT + player_id + 4
         self.fire_phaser_repeat_event = pygame.USEREVENT + player_id + 5
 
-    def handle_events(self, event: pygame.event.Event):
-        """Handles keyboard input to update movement and fire weapons.
-
-        This method should be called from the event loop to pass the
-        event object.
-        """
-        if not self.alive():
-            return
+    def _handle_movement_events(self, event: pygame.event.Event):
+        """Handle ship movement and rotation"""
         if event.type == pygame.KEYDOWN:
-            # Handle ship movement and rotation
             if event.key == pygame.constants.K_a:
                 self.rotate_ccw_lock = True
                 self.ang -= 22.5
@@ -128,6 +121,35 @@ class HumanShip(BaseShip):
                 pygame.time.set_timer(
                     self.acc_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.constants.K_a:
+                self.rotate_ccw_lock = False
+                pygame.time.set_timer(self.rotate_cc_repeat_event, 0)
+            if event.key == pygame.constants.K_d:
+                self.rotate_ccw_lock = True
+                pygame.time.set_timer(self.rotate_cw_repeat_event, 0)
+            if event.key == pygame.constants.K_s:
+                pygame.time.set_timer(self.acc_repeat_event, 0)
+
+        if event.type == self.rotate_cc_repeat_event:
+            # Update rotation
+            if self.rotate_ccw_lock:
+                self.ang -= 22.5
+            self.ang %= 360
+        if event.type == self.rotate_cw_repeat_event:
+            if not self.rotate_ccw_lock:
+                self.ang += 22.5
+            self.ang %= 360
+        if event.type == self.acc_repeat_event:
+            x_vel, y_vel = self.vel
+            x_vel += math.cos(self.ang * math.pi / 180)
+            y_vel += math.sin(self.ang * math.pi / 180)
+            self.vel = (x_vel, y_vel)
+
+    def _handle_firing_weapon_events(self, event: pygame.event.Event):
+        """Handles firing phasers and photon torpedoes"""
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.constants.K_q:
                 pygame.time.set_timer(
                     self.fire_phaser_repeat_event,
@@ -145,7 +167,6 @@ class HumanShip(BaseShip):
                     )
                     self.phaser_group.add(self.phaser)
                     self.phaser_last_fired = pygame.time.get_ticks()
-
             if event.key == pygame.constants.K_e:
                 pygame.time.set_timer(
                     self.fire_torpedoes_repeat_event,
@@ -162,33 +183,11 @@ class HumanShip(BaseShip):
                     self.torpedo_last_fired = pygame.time.get_ticks()
 
         if event.type == pygame.KEYUP:
-            if event.key == pygame.constants.K_a:
-                self.rotate_ccw_lock = False
-                pygame.time.set_timer(self.rotate_cc_repeat_event, 0)
-
-            if event.key == pygame.constants.K_d:
-                self.rotate_ccw_lock = True
-                pygame.time.set_timer(self.rotate_cw_repeat_event, 0)
-            if event.key == pygame.constants.K_s:
-                pygame.time.set_timer(self.acc_repeat_event, 0)
             if event.key == pygame.constants.K_q:
                 pygame.time.set_timer(self.fire_phaser_repeat_event, 0)
             if event.key == pygame.constants.K_e:
                 pygame.time.set_timer(self.fire_torpedoes_repeat_event, 0)
-        if event.type == self.rotate_cc_repeat_event:
-            # Update rotation
-            if self.rotate_ccw_lock:
-                self.ang -= 22.5
-            self.ang %= 360
-        if event.type == self.rotate_cw_repeat_event:
-            if not self.rotate_ccw_lock:
-                self.ang += 22.5
-            self.ang %= 360
-        if event.type == self.acc_repeat_event:
-            x_vel, y_vel = self.vel
-            x_vel += math.cos(self.ang * math.pi / 180)
-            y_vel += math.sin(self.ang * math.pi / 180)
-            self.vel = (x_vel, y_vel)
+
         if event.type == self.fire_phaser_repeat_event:
             self.phaser = Phaser(
                 source_ship=self,
@@ -208,3 +207,15 @@ class HumanShip(BaseShip):
                         start_vel=self.vel,
                     )
                 )
+
+    def handle_events(self, event: pygame.event.Event):
+        """Handles keyboard input to update movement and fire weapons.
+
+        This method should be called from the event loop to pass the
+        event object.
+        """
+        if not self.alive():
+            return
+
+        self._handle_movement_events(event)
+        self._handle_firing_weapon_events(event)
