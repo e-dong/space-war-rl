@@ -58,15 +58,19 @@ class BaseShip(SpaceEntity):
         self.torpedo_group.update(target_group=target_group)
         self.phaser_group.update(target_group=target_group)
 
-    def check_phaser_cooldown(self) -> bool:
+    def check_phaser_on_cooldown(self) -> bool:
         """Checks if the phaser is actively being fired"""
+        if not self.phaser_last_fired:
+            return False
         flight_time = pygame.time.get_ticks() - self.phaser_last_fired
         if flight_time > PHASER_FIRE_CD:
             return False
         return True
 
-    def check_torpedo_cooldown(self) -> bool:
+    def check_torpedo_on_cooldown(self) -> bool:
         """Checks if the phaser is actively being fired"""
+        if not self.torpedo_last_fired:
+            return False
         flight_time = pygame.time.get_ticks() - self.torpedo_last_fired
         if flight_time > TORPEDO_FIRE_CD:
             return False
@@ -167,10 +171,7 @@ class HumanShip(BaseShip):
                     self.fire_phaser_repeat_event,
                     PHASER_FIRE_CD,
                 )
-                if (
-                    not self.phaser_last_fired
-                    or not self.check_phaser_cooldown()
-                ):
+                if not self.check_phaser_on_cooldown():
                     self.phaser = Phaser(
                         source_ship=self,
                         start_pos=self.pos,
@@ -184,7 +185,10 @@ class HumanShip(BaseShip):
                     self.fire_torpedoes_repeat_event,
                     TORPEDO_FIRE_CD,
                 )
-                if len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP:
+                if (
+                    len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP
+                    and not self.check_torpedo_on_cooldown()
+                ):
                     self.torpedo_group.add(
                         PhotonTorpedo(
                             start_pos=self.pos,

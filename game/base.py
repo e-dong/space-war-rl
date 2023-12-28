@@ -3,7 +3,7 @@
 """
 import pygame
 
-from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH
+from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH, SpaceEntityType
 
 
 class SpaceEntity(pygame.sprite.Sprite):
@@ -12,17 +12,19 @@ class SpaceEntity(pygame.sprite.Sprite):
     Features screen wrap-around, frictionless/zero gravity physics, and
     rotation. Subclasses should implement collision handling.
 
-    Attributes:
-        surf: The reference to the original Surface, used for rotation
-        image: The reference to the latest surface based on the other
-               state vars
-        pos: The x,y of the position on the screen
-        rect: The rect object
-        vel: The velocity of the space entity
-        ang: The angle in degrees representing the direction the ship is facing
+    Attributes
+    ----------
+    entity_type: The type of space entity
+    surf: The reference to the original Surface, used for rotation
+    image: The reference to the latest surface based on the other
+           state vars
+    pos: The x,y of the position on the screen
+    rect: The rect object
+    vel: The velocity of the space entity
+    ang: The angle in degrees representing the direction the ship is facing
     """
 
-    entity_type: int
+    entity_type: SpaceEntityType
     surf: pygame.surface.Surface
     image: pygame.surface.Surface
     pos: tuple[int, int]
@@ -42,20 +44,22 @@ class SpaceEntity(pygame.sprite.Sprite):
         self.vel = start_vel
         self.ang = start_ang
 
-    def update(self, *_args, **_kwargs):
+    def update(self, *_args, **kwargs):
         """Entrypoint for updating the player state each frame"""
         x_pos, y_pos = self.pos
         x_vel, y_vel = self.vel
 
+        screen_wrap = kwargs["screen_wrap"] if "screen_wrap" in kwargs else True
         # Conditions for wrapping around the screen
-        if x_pos >= SCREEN_WIDTH:
-            x_pos = 0
-        elif x_pos <= 0:
-            x_pos = SCREEN_WIDTH
-        if y_pos >= SCREEN_HEIGHT:
-            y_pos = 0
-        elif y_pos <= 0:
-            y_pos = SCREEN_HEIGHT
+        if screen_wrap:
+            if x_pos >= SCREEN_WIDTH:
+                x_pos = 0
+            elif x_pos <= 0:
+                x_pos = SCREEN_WIDTH
+            if y_pos >= SCREEN_HEIGHT:
+                y_pos = 0
+            elif y_pos <= 0:
+                y_pos = SCREEN_HEIGHT
 
         # Apply velocity to position
         x_pos += x_vel

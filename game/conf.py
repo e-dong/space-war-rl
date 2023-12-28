@@ -4,9 +4,11 @@ from typing import TypedDict
 
 import pygame
 
+# TODO: Replace this config with hydra yml configuration
+
 
 class SpaceEntityType(Enum):
-    """Simple enum to determine the weapon type"""
+    """Simple enum to determine the space entity type"""
 
     SHIP, TORPEDO, PHASER = range(3)
 
@@ -16,7 +18,7 @@ SpriteConfig = TypedDict(
     {
         "id": str,
         "sprite": pygame.sprite.Sprite,
-        "group": pygame.sprite.Group,
+        "group": pygame.sprite.GroupSingle,
     },
 )
 
@@ -30,11 +32,11 @@ SCREEN_HEIGHT = 600
 MOVEMENT_TIME_DELAY_MS = 100
 # The cooldown period before firing phasers again
 PHASER_FIRE_CD = 300
-PHASER_MAX_FLIGHT_MS = 100
+PHASER_MAX_FLIGHT_MS = 50
 PHASER_LENGTH = 100
 PHASER_WIDTH = 1
 # The cooldown period before firing torpedoes again
-TORPEDO_FIRE_CD = 150
+TORPEDO_FIRE_CD = 100
 # The max time in ms a torpedo is allowed to fly for
 TORPEDO_MAX_FLIGHT_MS = 10000
 TORPEDO_SPEED = 4.5

@@ -16,8 +16,34 @@ from game.conf import (
 )
 
 
-class Phaser(SpaceEntity):
-    """The phaser weapon, fires a straight line up to a fixed distance"""
+class BaseWeapon(SpaceEntity):
+    """Common base class for weapons"""
+
+    def __init__(
+        self, duration, entity_type, surf, start_pos, start_ang, start_vel
+    ) -> None:
+        super().__init__(entity_type, surf, start_pos, start_ang, start_vel)
+        self.start_time = pygame.time.get_ticks()
+        self.duration = duration
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        flight_time = pygame.time.get_ticks() - self.start_time
+        if flight_time > self.duration:
+            self.kill()
+
+
+class Phaser(BaseWeapon):
+    """The phaser weapon, fires a straight line up to a fixed distance
+
+    Attributes
+    ----------
+    source_ship: The ship that is firing the phaser
+    active: Whether the phaser is actively being fired or not
+    start_time: The start time used to check duration of the phaser
+    ship_pos: The center position of the source_ship
+
+    """
 
     source_ship: pygame.sprite.Sprite
     active: bool
@@ -28,23 +54,28 @@ class Phaser(SpaceEntity):
         self.source_ship = source_ship
         surf = Surface([PHASER_LENGTH, PHASER_WIDTH]).convert_alpha()
         super().__init__(
-            SpaceEntityType.PHASER, surf, start_pos, start_ang, start_vel
+            PHASER_MAX_FLIGHT_MS,
+            SpaceEntityType.PHASER,
+            surf,
+            start_pos,
+            start_ang,
+            start_vel,
         )
-        self.start_time = pygame.time.get_ticks()
         self.active = True
-        # Update rotation to surface
+        # update rotation to surface
         self.ang %= 360
         self.ship_pos = start_pos
 
-        # Translate the phaser due to rotation to center
+        # translate the phaser due to rotation of center
         phaser_x_pos = self.pos[0] + (PHASER_LENGTH / 2) * math.cos(
             self.ang * math.pi / 180
         )
         phaser_y_pos = self.pos[1] + (PHASER_LENGTH / 2) * math.sin(
             self.ang * math.pi / 180
         )
-
         self.pos = (phaser_x_pos, phaser_y_pos)
+
+        # rotate the surface to be aligned with the ship's angle
         surf = pygame.transform.rotate(self.surf, -self.ang)
         self.rect = surf.get_rect(center=self.pos)
 
@@ -81,20 +112,21 @@ class Phaser(SpaceEntity):
             if idx_to_kill is not None:
                 collided_sprites[idx_to_kill].kill()
             pygame.draw.line(
-                self.image, "white", start_pos=(0, 0), end_pos=(end_x, 0)
+                self.image,
+                "white",
+                start_pos=(0, 0),
+                end_pos=(end_x, 0),
+                width=PHASER_WIDTH,
             )
             self.active = False
 
     def update(self, *args, **kwargs):
         self.draw_laser(kwargs["target_group"])
+        kwargs["screen_wrap"] = False
         super().update(*args, **kwargs)
 
-        flight_time = pygame.time.get_ticks() - self.start_time
-        if flight_time > PHASER_MAX_FLIGHT_MS:
-            self.kill()
 
-
-class PhotonTorpedo(SpaceEntity):
+class PhotonTorpedo(BaseWeapon):
     """Represents the photon torpedo object that a ship can fire"""
 
     start_time: int
@@ -104,6 +136,7 @@ class PhotonTorpedo(SpaceEntity):
         torpedo_x_pos = start_pos[0] + 36 * math.cos(start_ang * math.pi / 180)
         torpedo_y_pos = start_pos[1] + 36 * math.sin(start_ang * math.pi / 180)
         super().__init__(
+            TORPEDO_MAX_FLIGHT_MS,
             SpaceEntityType.TORPEDO,
             surf,
             (torpedo_x_pos, torpedo_y_pos),
@@ -124,19 +157,14 @@ class PhotonTorpedo(SpaceEntity):
         y_vel += TORPEDO_SPEED * math.sin(self.ang * math.pi / 180)
         self.vel = (x_vel, y_vel)
 
-        self.start_time = pygame.time.get_ticks()
-
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         # Torpedo needs to be rotated an additional 90 degrees
         # due to the orientation it was originally drawn
         self.image = pygame.transform.rotate(self.surf, -(self.ang + 90))
         self.rect = self.image.get_rect(center=self.pos)
-        # group and collision management
-        flight_time = pygame.time.get_ticks() - self.start_time
-        if flight_time > TORPEDO_MAX_FLIGHT_MS:
-            self.kill()
 
+        # group and collision management
         for sprite in kwargs["target_group"].sprites():
             if sprite != self and self.rect.colliderect(sprite.rect):
                 sprite.kill()
