@@ -17,6 +17,7 @@
   "pylint.importStrategy": "fromEnvironment",
   "pylint.args": ["--extension-pkg-whitelist=pygame"],
   "flake8.path": ["venv/bin/flake8"],
+  "flake8.args": ["--line-length", "80"],
   "flake8.importStrategy": "fromEnvironment",
   "cSpell.words": [
     "arange",
