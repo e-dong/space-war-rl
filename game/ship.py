@@ -13,6 +13,7 @@ from game.conf import (
     SpaceEntityType,
 )
 from game.projectile import Phaser, PhotonTorpedo
+from game.util import check_overlapping_sprites
 
 # TODO: refactor the interaction logic into "actions"
 # The human ship would call these action functions in handle_events
@@ -76,12 +77,38 @@ class BaseShip(SpaceEntity):
             return False
         return True
 
-    def check_ship_collision(self) -> bool:
-        """Checks if the phaser is actively being fired"""
-        flight_time = pygame.time.get_ticks() - self.last_collided_ship
-        if flight_time > 100:
-            return False
-        return True
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+
+        for sprite in kwargs["target_group"].sprites():
+            if (
+                sprite != self
+                and self.rect.colliderect(sprite.rect)
+                and sprite.entity_type == SpaceEntityType.SHIP
+            ):
+                self_vel_x, self_vel_y = self.vel
+                other_vel_x, other_vel_y = sprite.vel
+
+                new_self_vel_x = (self_vel_x * 0.2) + (other_vel_x * 0.75)
+                new_self_vel_y = (self_vel_y * 0.2) + (other_vel_y * 0.75)
+                new_other_vel_x = (other_vel_x * 0.2) + (self_vel_x * 0.75)
+                new_other_vel_y = (other_vel_y * 0.2) + (self_vel_y * 0.75)
+
+                self.vel = (new_self_vel_x, new_self_vel_y)
+                sprite.vel = (new_other_vel_x, new_other_vel_y)
+
+                self.last_collided_ship = pygame.time.get_ticks()
+
+                # Detect any overlap and move the ships
+                overlap_x, overlap_y = check_overlapping_sprites(self, sprite)
+
+                if overlap_x:
+                    sprite.pos = (sprite.pos[0] + sprite.vel[0], sprite.pos[1])
+                if overlap_y:
+                    sprite.pos = (
+                        sprite.pos[0],
+                        sprite.pos[1] + sprite.vel[1],
+                    )
 
 
 class HumanShip(BaseShip):
@@ -235,27 +262,3 @@ class HumanShip(BaseShip):
 
         self._handle_movement_events(event)
         self._handle_firing_weapon_events(event)
-
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        for sprite in kwargs["target_group"].sprites():
-            if (
-                sprite != self
-                and self.rect.colliderect(sprite.rect)
-                and sprite.entity_type == SpaceEntityType.SHIP
-            ):
-                if (
-                    not self.last_collided_ship
-                    or not self.check_ship_collision()
-                ):
-                    self_vel_x, self_vel_y = self.vel
-                    other_vel_x, other_vel_y = sprite.vel
-
-                    new_self_vel_x = (self_vel_x * 0.25) + (other_vel_x * 0.75)
-                    new_self_vel_y = (self_vel_y * 0.25) + (other_vel_y * 0.75)
-                    new_other_vel_x = (other_vel_x * 0.25) + (self_vel_x * 0.75)
-                    new_other_vel_y = (other_vel_y * 0.25) + (self_vel_y * 0.75)
-
-                    self.vel = (new_self_vel_x, new_self_vel_y)
-                    sprite.vel = (new_other_vel_x, new_other_vel_y)
-                    self.last_collided_ship = pygame.time.get_ticks()
