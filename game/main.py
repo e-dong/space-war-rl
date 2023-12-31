@@ -14,8 +14,8 @@ from game.ship import BaseShip, HumanShip
 def render_sprites(sprite_cfg, player_target_group, surface):
     """Draws and updates sprites and groups to screen"""
     for player in sprite_cfg:
-        player["group"].draw(surface)
         player["sprite"].draw_groups(surface)
+        player["group"].draw(surface)
         player["group"].update(target_group=player_target_group)
         player["sprite"].update_groups(target_group=player_target_group)
 

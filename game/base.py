@@ -33,14 +33,25 @@ class SpaceEntity(pygame.sprite.Sprite):
     ang: float
 
     def __init__(
-        self, entity_type, surf, start_pos, start_ang=0, start_vel=(0, 0)
+        self,
+        entity_type,
+        surf,
+        start_pos,
+        start_ang=0,
+        start_vel=(0, 0),
+        rotation_point=None,
     ) -> None:
-        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
         self.entity_type = entity_type
         self.surf = surf
         self.image = surf
         self.pos = start_pos
-        self.rect = surf.get_rect(center=self.pos)
+        self.rotation_point = rotation_point
+        if self.rotation_point:
+            self.rect = surf.get_rect(center=self.rotation_point)
+        else:
+            self.rect = surf.get_rect(center=start_pos)
+
         self.vel = start_vel
         self.ang = start_ang
 
@@ -62,13 +73,20 @@ class SpaceEntity(pygame.sprite.Sprite):
                 y_pos = SCREEN_HEIGHT
 
         # Apply velocity to position
-        x_pos += x_vel
-        y_pos += y_vel
-        self.rect.x = x_pos
-        self.rect.y = y_pos
-        self.pos = (x_pos, y_pos)
+        update_pos = kwargs["update_pos"] if "update_pos" in kwargs else True
+        if update_pos:
+            x_pos += x_vel
+            y_pos += y_vel
+            self.rect.x = x_pos
+            self.rect.y = y_pos
+            self.pos = (x_pos, y_pos)
 
         # Update rotation to surface
-        self.ang %= 360
-        self.image = pygame.transform.rotate(self.surf, -self.ang)
-        self.rect = self.image.get_rect(center=self.pos)
+        rotation = kwargs["rotation"] if "rotation" in kwargs else True
+        if rotation:
+            self.ang %= 360
+            self.image = pygame.transform.rotate(self.surf, -self.ang)
+            rotation_point = (
+                self.rotation_point if self.rotation_point else self.pos
+            )
+            self.rect = self.image.get_rect(center=rotation_point)

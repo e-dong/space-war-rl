@@ -12,8 +12,8 @@ from game.conf import (
     TORPEDO_FIRE_CD,
     SpaceEntityType,
 )
-from game.projectile import Phaser, PhotonTorpedo
 from game.util import check_overlapping_sprites
+from game.weapon import Phaser, PhotonTorpedo
 
 # TODO: refactor the interaction logic into "actions"
 # The human ship would call these action functions in handle_events
@@ -51,13 +51,16 @@ class BaseShip(SpaceEntity):
 
     def draw_groups(self, surface: pygame.Surface):
         """Draws the torpedo and phaser group to the surface"""
-        self.torpedo_group.draw(surface)
+
         self.phaser_group.draw(surface)
+        self.torpedo_group.draw(surface)
 
     def update_groups(self, target_group: pygame.sprite.Group):
         """Calls update on the torpedo and phaser group"""
         self.torpedo_group.update(target_group=target_group)
-        self.phaser_group.update(target_group=target_group)
+        self.phaser_group.update(
+            target_group=target_group, ship_ang=self.ang, ship_pos=self.pos
+        )
 
     def check_phaser_on_cooldown(self) -> bool:
         """Checks if the phaser is actively being fired"""
@@ -130,7 +133,6 @@ class HumanShip(BaseShip):
         start_ang: float,
     ) -> None:
         super().__init__(player_id, image_path, start_pos, start_ang)
-
         self.rotate_ccw_lock = False
 
         # create custom event to check user input
@@ -199,12 +201,7 @@ class HumanShip(BaseShip):
                     PHASER_FIRE_CD,
                 )
                 if not self.check_phaser_on_cooldown():
-                    self.phaser = Phaser(
-                        source_ship=self,
-                        start_pos=self.pos,
-                        start_vel=self.vel,
-                        start_ang=self.ang,
-                    )
+                    self.phaser = Phaser(source_ship=self)
                     self.phaser_group.add(self.phaser)
                     self.phaser_last_fired = pygame.time.get_ticks()
             if event.key == pygame.constants.K_e:
@@ -232,12 +229,7 @@ class HumanShip(BaseShip):
                 pygame.time.set_timer(self.fire_torpedoes_repeat_event, 0)
 
         if event.type == self.fire_phaser_repeat_event:
-            self.phaser = Phaser(
-                source_ship=self,
-                start_pos=self.pos,
-                start_vel=self.vel,
-                start_ang=self.ang,
-            )
+            self.phaser = Phaser(source_ship=self)
             self.phaser_last_fired = pygame.time.get_ticks()
             self.phaser_group.add(self.phaser)
         if event.type == self.fire_torpedoes_repeat_event:
