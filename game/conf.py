@@ -33,12 +33,12 @@ MOVEMENT_TIME_DELAY_MS = 100
 # The cooldown period before firing phasers again
 PHASER_FIRE_CD = 300
 PHASER_MAX_FLIGHT_MS = 50
-PHASER_LENGTH = 100
+PHASER_LENGTH = 150
 PHASER_WIDTH = 1
 # The cooldown period before firing torpedoes again
 TORPEDO_FIRE_CD = 100
 # The max time in ms a torpedo is allowed to fly for
 TORPEDO_MAX_FLIGHT_MS = 10000
-TORPEDO_SPEED = 4.5
+TORPEDO_SPEED = 3.5
 # The max number of concurrent torpedoes a ship can fire
 MAX_TORPEDOES_PER_SHIP = 7
