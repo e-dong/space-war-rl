@@ -177,6 +177,8 @@ class Phaser(BaseWeapon):
             else (lambda y: slope * y + intercept)
         )
 
+        # TODO: Make screen wrap around logic iterative
+
         self.target_pos = (
             ship_pos[0] + PHASER_LENGTH * math.cos(ship_ang * math.pi / 180),
             ship_pos[1] + PHASER_LENGTH * math.sin(ship_ang * math.pi / 180),
