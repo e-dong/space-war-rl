@@ -183,24 +183,24 @@ class Phaser(BaseWeapon):
         )
 
         x_pos, y_pos = self.target_pos
-        new_x_pos, new_y_pos = self.target_pos
+        new_x_pos, new_y_pos = ship_pos
 
         if x_pos >= SCREEN_WIDTH:
             x_pos = SCREEN_WIDTH
-            y_pos = y_linear_eq(x_pos) if slope > 0 else y_pos
+            y_pos = y_linear_eq(x_pos) if slope != 0 else y_pos
             new_x_pos = 0
         elif x_pos <= 0:
             x_pos = 0
-            y_pos = y_linear_eq(x_pos) if slope > 0 else y_pos
+            y_pos = y_linear_eq(x_pos) if slope != 0 else y_pos
             new_x_pos = SCREEN_WIDTH
 
         if y_pos >= SCREEN_HEIGHT:
             y_pos = SCREEN_HEIGHT
-            x_pos = x_linear_eq(y_pos) if slope > 0 else x_pos
+            x_pos = x_linear_eq(y_pos) if slope != 0 else x_pos
             new_y_pos = 0
         elif y_pos <= 0:
             y_pos = 0
-            x_pos = x_linear_eq(y_pos) if slope > 0 else x_pos
+            x_pos = x_linear_eq(y_pos) if slope != 0 else x_pos
             new_y_pos = SCREEN_HEIGHT
 
         self.target_pos = (x_pos, y_pos)
