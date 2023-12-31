@@ -20,18 +20,21 @@ from game.conf import (
 
 
 class BaseWeapon(pygame.sprite.Sprite):
-    """Common base class for weapons"""
+    """Simple base class for weapons. All weapons have a specific duration."""
 
     def __init__(self, duration) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.start_time = pygame.time.get_ticks()
-        self.duration = duration
+        self.max_duration = duration
 
-    def check_expired(self):
-        flight_time = pygame.time.get_ticks() - self.start_time
-        return flight_time > self.duration
+    def check_expired(self) -> bool:
+        """Returns True if duration of weapon exceeds the max duration"""
+        current_duration = pygame.time.get_ticks() - self.start_time
+        return current_duration >= self.max_duration
 
-    def update(self, *args: Any, **kwargs: Any) -> None:
+    def update(self, *args: Any, **kwargs: Any):
+        """Update entrypoint for weapons"""
+
         super().update(*args, **kwargs)
         if self.check_expired():
             self.kill()
@@ -46,6 +49,7 @@ class Phaser(BaseWeapon):
     active: Whether the phaser is actively being fired or not
     start_time: The start time used to check duration of the phaser
     ship_pos: The center position of the source_ship
+    coords: List of coordinates to draw the phaser
 
     """
 
@@ -74,6 +78,7 @@ class Phaser(BaseWeapon):
         self.coords = []
 
     def draw_phaser(self):
+        """Draws coordinates for the phaser"""
         for start_pos, end_pos in self.coords:
             pygame.draw.line(
                 self.image,
@@ -133,7 +138,7 @@ class Phaser(BaseWeapon):
 
             self.coords.append((start_pos, end_pos))
 
-            if rect_idx == None or rect_idx == 1:
+            if rect_idx is None or rect_idx == 1:
                 self.coords.append(
                     (
                         self.hit_detect_info["start_pos"][0],
@@ -143,7 +148,8 @@ class Phaser(BaseWeapon):
 
             self.active = False
 
-    def update_surface(self, ship_pos, ship_ang):
+    def update_hit_detector_rects(self, ship_pos, ship_ang):
+        """Creates hit detection rectangles for the phasers"""
         slope_ang = ship_ang % 180
         slope = (
             math.tan(slope_ang * (math.pi / 180))
@@ -236,15 +242,13 @@ class Phaser(BaseWeapon):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
-        self.update_surface(kwargs["ship_pos"], kwargs["ship_ang"])
+        self.update_hit_detector_rects(kwargs["ship_pos"], kwargs["ship_ang"])
         self.handle_collision(target_group=kwargs["target_group"])
         self.draw_phaser()
 
 
 class PhotonTorpedo(BaseWeapon, SpaceEntity):
     """Represents the photon torpedo object that a ship can fire"""
-
-    start_time: int
 
     def __init__(self, start_pos, start_ang, start_vel) -> None:
         surf = Surface([12, 12]).convert_alpha()

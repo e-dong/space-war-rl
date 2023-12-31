@@ -56,12 +56,15 @@ class SpaceEntity(pygame.sprite.Sprite):
         self.ang = start_ang
 
     def update(self, *_args, **kwargs):
-        """Entrypoint for updating the player state each frame"""
+        """Entrypoint for updating the player state each frame
+
+        screen_wrap, pos, and rotation updates can be disabled if set to False
+        """
         x_pos, y_pos = self.pos
         x_vel, y_vel = self.vel
 
         screen_wrap = kwargs["screen_wrap"] if "screen_wrap" in kwargs else True
-        # Conditions for wrapping around the screen
+        # conditions for wrapping around the screen
         if screen_wrap:
             if x_pos >= SCREEN_WIDTH:
                 x_pos = 0
@@ -72,7 +75,7 @@ class SpaceEntity(pygame.sprite.Sprite):
             elif y_pos <= 0:
                 y_pos = SCREEN_HEIGHT
 
-        # Apply velocity to position
+        # apply velocity to position
         update_pos = kwargs["update_pos"] if "update_pos" in kwargs else True
         if update_pos:
             x_pos += x_vel
@@ -81,7 +84,7 @@ class SpaceEntity(pygame.sprite.Sprite):
             self.rect.y = y_pos
             self.pos = (x_pos, y_pos)
 
-        # Update rotation to surface
+        # update rotation to surface
         rotation = kwargs["rotation"] if "rotation" in kwargs else True
         if rotation:
             self.ang %= 360
