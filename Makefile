@@ -4,7 +4,7 @@
 # User CLI Targets
 # Default target
 game:
-	venv/bin/python -m game.main
+	venv/bin/python -m space_war.main
 
 ########################################################
 # Dependencies
@@ -12,6 +12,20 @@ game:
 
 dev: venv/dev_installed
 prod: venv/wheel_installed
+
+web-dev: pre-web
+	venv/bin/pip install -e .[web]
+	venv/bin/pygbag --width 800 --height 600 --ume_block=0 tmp
+
+web-pack: pre-web
+	venv/bin/pip install .[web]
+	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --archive tmp
+
+pre-web:
+	rm -rf tmp
+	mkdir tmp
+	cp -r space_war tmp
+	mv tmp/space_war/main.py tmp
 
 # venv setup and requirements.txt installed
 venv/venv_created: requirements.txt
@@ -24,7 +38,7 @@ venv/dev_installed: venv/venv_created requirements-dev.txt setup.py
 	touch venv/dev_installed
 
 # Install the wheel in "production"
-venv/wheel_installed: venv/venv_created setup.py game/**.py game/assets/**
+venv/wheel_installed: venv/venv_created setup.py space_war/**.py space_war/sim/assets/**
 	venv/bin/pip install .[build]
 	touch venv/wheel_installed
 	
@@ -35,9 +49,9 @@ clean:
 # Development
 ########################################################
 format: dev
-	venv/bin/black --line-length 80 game/**.py
+	venv/bin/black --line-length 80 space_war/**.py
 
 lint: dev
-	venv/bin/pylint game/**.py
-	venv/bin/flake8 game/**.py
-	venv/bin/isort game/**.py
+	venv/bin/pylint --extension-pkg-whitelist=pygame space_war/**.py
+	venv/bin/flake8 space_war/**.py
+	venv/bin/isort space_war/**.py
