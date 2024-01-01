@@ -1,14 +1,25 @@
 """Contains the main entrypoint logic"""
+import asyncio
+from pathlib import Path
+
+import pygame
+
+from space_war.sim.conf import (
+    MAX_FPS,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SpriteConfig,
+)
+from space_war.sim.ship import BaseShip, HumanShip
+
+# pygame setup
+pygame.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
 
 # TODO: Use dummy display for training headless
 # import os
 # os.environ["SDL_VIDEODRIVER"] = "dummy"
-
-import pygame
-
-from game import module_path
-from game.conf import MAX_FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SpriteConfig
-from game.ship import BaseShip, HumanShip
 
 
 def render_sprites(sprite_cfg, player_target_group, surface):
@@ -33,7 +44,9 @@ def get_player_sprites(
     for player_id, instance in enumerate(instance_iter):
         player_sprite = instance(
             player_id=player_id,
-            image_path=module_path() / "assets" / f"player_{player_id}.png",
+            image_path=Path(
+                "space_war", "sim", "assets", f"player_{player_id}.png"
+            ),
             start_pos=pos_iter[player_id],
             start_ang=ang_iter[player_id],
         )
@@ -46,12 +59,8 @@ def get_player_sprites(
     return sprites, sprite_cfg
 
 
-def main():
+async def main():
     """Entrypoint for starting up the pygame"""
-    # pygame setup
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    clock = pygame.time.Clock()
 
     # TODO: hydra will make this cleaner
     player_sprites, cfg = get_player_sprites(
@@ -96,10 +105,12 @@ def main():
         render_sprites(cfg, player_target_group, screen)
 
         pygame.display.update()
+        await asyncio.sleep(0)
         clock.tick(MAX_FPS)
 
     pygame.quit()
 
 
 if __name__ == "__main__":
-    main()
+    # This is the program entry point:
+    asyncio.run(main())

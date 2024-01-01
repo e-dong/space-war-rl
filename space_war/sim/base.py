@@ -3,7 +3,7 @@
 """
 import pygame
 
-from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH, SpaceEntityType
+from space_war.sim.conf import SCREEN_HEIGHT, SCREEN_WIDTH, SpaceEntityType
 
 
 class SpaceEntity(pygame.sprite.Sprite):

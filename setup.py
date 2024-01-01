@@ -18,6 +18,7 @@ setup(
     extras_require={
         "dev": install_requires("requirements-dev.txt"),
         "build": ["wheel"],
+        "web": ["pygbag"],
     },
     packages=find_packages(),
     include_package_data=True,

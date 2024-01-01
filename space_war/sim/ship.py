@@ -4,16 +4,16 @@ from pathlib import Path
 
 import pygame
 
-from game.base import SpaceEntity
-from game.conf import (
+from space_war.sim.base import SpaceEntity
+from space_war.sim.conf import (
     MAX_TORPEDOES_PER_SHIP,
     MOVEMENT_TIME_DELAY_MS,
     PHASER_FIRE_CD,
     TORPEDO_FIRE_CD,
     SpaceEntityType,
 )
-from game.util import check_overlapping_sprites
-from game.weapon import Phaser, PhotonTorpedo
+from space_war.sim.util import check_overlapping_sprites
+from space_war.sim.weapon import Phaser, PhotonTorpedo
 
 # TODO: refactor the interaction logic into "actions"
 # The human ship would call these action functions in handle_events

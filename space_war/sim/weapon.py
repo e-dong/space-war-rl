@@ -6,8 +6,8 @@ from typing import Any
 import pygame
 from pygame import Surface
 
-from game.base import SpaceEntity
-from game.conf import (
+from space_war.sim.base import SpaceEntity
+from space_war.sim.conf import (
     PHASER_LENGTH,
     PHASER_MAX_FLIGHT_MS,
     PHASER_WIDTH,
