@@ -4,7 +4,7 @@
 # User CLI Targets
 # Default target
 game:
-	venv/bin/python -m main
+	venv/bin/python -m space_war.main
 
 ########################################################
 # Dependencies
@@ -13,13 +13,19 @@ game:
 dev: venv/dev_installed
 prod: venv/wheel_installed
 
-web-dev:
+web-dev: pre-web
 	venv/bin/pip install -e .[web]
-	venv/bin/pygbag --width 800 --height 600 --ume_block=0 .
+	venv/bin/pygbag --width 800 --height 600 --ume_block=0 tmp
 
-web-pack:
+web-pack: pre-web
 	venv/bin/pip install .[web]
-	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --archive .
+	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --archive tmp
+
+pre-web:
+	rm -rf tmp
+	mkdir tmp
+	cp -r space_war tmp
+	mv tmp/space_war/main.py tmp
 
 # venv setup and requirements.txt installed
 venv/venv_created: requirements.txt
