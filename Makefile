@@ -52,6 +52,6 @@ format: dev
 	venv/bin/black --line-length 80 space_war/**.py
 
 lint: dev
-	venv/bin/pylint space_war/**.py
+	venv/bin/pylint --extension-pkg-whitelist=pygame space_war/**.py
 	venv/bin/flake8 space_war/**.py
 	venv/bin/isort space_war/**.py
