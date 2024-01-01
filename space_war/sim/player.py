@@ -1,20 +1,20 @@
 """Collection of Player Classes"""
 import math
 
-from pygame import KEYDOWN, KEYUP, image, key, transform
+from pygame import KEYDOWN, KEYUP, key, transform
 from pygame.constants import K_a, K_d, K_s
 from pygame.event import Event
 from pygame.sprite import Sprite
 
-from game.conf import SCREEN_HEIGHT, SCREEN_WIDTH
+from space_war.sim.conf import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class HumanPlayer(Sprite):
     """Represents the human player"""
 
-    def __init__(self, image_path, start_pos, start_ang=0) -> None:
+    def __init__(self, surf, start_pos, start_ang=0) -> None:
         super().__init__()
-        self.surf = image.load(image_path).convert_alpha()
+        self.surf = surf
         self.image = self.surf
         self.pos = start_pos
         self.rect = self.surf.get_rect(center=self.pos)
