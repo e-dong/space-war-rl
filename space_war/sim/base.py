@@ -80,9 +80,8 @@ class SpaceEntity(pygame.sprite.Sprite):
         if update_pos:
             x_pos += x_vel
             y_pos += y_vel
-            self.rect.x = x_pos
-            self.rect.y = y_pos
             self.pos = (x_pos, y_pos)
+            self.rect.center = self.pos
 
         # update rotation to surface
         rotation = kwargs["rotation"] if "rotation" in kwargs else True
