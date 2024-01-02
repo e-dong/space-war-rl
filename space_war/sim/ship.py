@@ -1,6 +1,9 @@
 """Collection of Ship Classes"""
 import math
+import platform
+import uuid
 from pathlib import Path
+from threading import Thread
 
 import pygame
 
@@ -17,6 +20,46 @@ from space_war.sim.weapon import Phaser, PhotonTorpedo
 
 # TODO: refactor the interaction logic into "actions"
 # The human ship would call these action functions in handle_events
+
+
+def patch_timer():
+    # pylint: disable-next=import-outside-toplevel
+    import asyncio
+
+    # pylint: disable-next=import-error,import-outside-toplevel
+    import aio.gthread
+
+    THREADS = {}
+
+    def patch_set_timer(cust_event_no, millis, loops=0):
+        dlay = float(millis) / 1000
+        cevent = pygame.event.Event(cust_event_no)
+
+        async def fire_event(thread_uuid):
+            await asyncio.sleep(dlay)
+            while not aio.exit and (
+                (
+                    cust_event_no in THREADS
+                    and THREADS[cust_event_no] == thread_uuid
+                )
+            ):
+                pygame.event.post(cevent)
+
+                await asyncio.sleep(dlay)
+
+        if dlay > 0:
+            thread_uuid = uuid.uuid4()
+            Thread(target=fire_event, args=[thread_uuid]).start()
+            THREADS[cust_event_no] = thread_uuid
+
+        else:
+            del THREADS[cust_event_no]
+
+    pygame.time.set_timer = patch_set_timer
+
+
+if platform.system().lower() == "emscripten":
+    patch_timer()
 
 
 class BaseShip(SpaceEntity):
