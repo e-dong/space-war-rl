@@ -67,7 +67,7 @@ class BaseShip(SpaceEntity):
         if not self.phaser_last_fired:
             return False
         flight_time = pygame.time.get_ticks() - self.phaser_last_fired
-        if flight_time > PHASER_FIRE_CD:
+        if flight_time >= PHASER_FIRE_CD:
             return False
         return True
 
@@ -76,7 +76,8 @@ class BaseShip(SpaceEntity):
         if not self.torpedo_last_fired:
             return False
         flight_time = pygame.time.get_ticks() - self.torpedo_last_fired
-        if flight_time > TORPEDO_FIRE_CD:
+
+        if flight_time >= TORPEDO_FIRE_CD:
             return False
         return True
 
