@@ -54,7 +54,8 @@ def patch_timer():
             THREADS[cust_event_no] = thread_uuid
 
         else:
-            del THREADS[cust_event_no]
+            if cust_event_no in THREADS:
+                del THREADS[cust_event_no]
 
     pygame.time.set_timer = patch_set_timer
 
