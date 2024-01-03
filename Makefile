@@ -38,20 +38,24 @@ venv/dev_installed: venv/venv_created requirements-dev.txt setup.py
 	touch venv/dev_installed
 
 # Install the wheel in "production"
-venv/wheel_installed: venv/venv_created setup.py space_war/**.py space_war/sim/assets/**
+venv/wheel_installed: venv/venv_created setup.py space_war/**/*.py space_war/sim/assets/**
 	venv/bin/pip install .[build]
 	touch venv/wheel_installed
 	
 clean:
-	git clean -fdx
+	rm -rf ./**/*/__pycache__
+	rm -rf ./build
+	rm -rf ./tmp
+	rm -rf ./venv
+	rm -rf *.egg-info
 
 ########################################################
 # Development
 ########################################################
 format: dev
-	venv/bin/black --line-length 80 space_war/**.py
+	venv/bin/black --line-length 80 space_war/**/*.py
 
 lint: dev
-	venv/bin/pylint --extension-pkg-whitelist=pygame space_war/**.py
-	venv/bin/flake8 space_war/**.py
-	venv/bin/isort space_war/**.py
+	venv/bin/pylint --extension-pkg-whitelist=pygame space_war/**/*.py
+	venv/bin/flake8 space_war/**/*.py
+	venv/bin/isort space_war/**/*.py
