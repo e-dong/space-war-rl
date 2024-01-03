@@ -1,9 +1,9 @@
 """Collection of Ship Classes"""
 import math
 import platform
-import uuid
 from pathlib import Path
 from threading import Thread
+from typing import Union
 
 import pygame
 
@@ -30,32 +30,54 @@ def patch_timer():
     # pylint: disable-next=import-error,import-outside-toplevel
     import aio.gthread
 
+    # Global var to keep track of timer threads
+    #   - key: event type
+    #   - value: thread uuid
     THREADS = {}
 
-    def patch_set_timer(cust_event_no, millis, loops=0):
+    def patch_set_timer(
+        event: Union[int, pygame.event.Event], millis: int, loops: int = 0
+    ):
+        """Patches the pygame.time.set_timer function to use gthreads"""
+
         dlay = float(millis) / 1000
-        cevent = pygame.event.Event(cust_event_no)
+        cevent = pygame.event.Event(event)
+        event_loop = asyncio.get_event_loop()
 
         async def fire_event(thread_uuid):
-            await asyncio.sleep(dlay)
-            while not aio.exit and (
-                (
-                    cust_event_no in THREADS
-                    and THREADS[cust_event_no] == thread_uuid
-                )
-            ):
-                pygame.event.post(cevent)
+            """The thread's target function to handle the timer
 
+            Early exit conditions:
+            - event loop is closed
+            - event type is no longer in THREADS dictionary
+            - the thread's uuid is not the latest one
+            - Max loop iterations if loops param is not zero
+            """
+            loop_counter = 0
+            while True:
                 await asyncio.sleep(dlay)
+                if (
+                    event_loop.is_closed()
+                    or event not in THREADS
+                    or THREADS[event] != thread_uuid
+                    or (loops and loop_counter >= loops)
+                ):
+                    break
+
+                pygame.event.post(cevent)
+                loop_counter += 1 if loops else 0
 
         if dlay > 0:
+            # uuid is used to track the latest thread,
+            # stale threads will be terminated
             thread_uuid = uuid.uuid4()
             Thread(target=fire_event, args=[thread_uuid]).start()
-            THREADS[cust_event_no] = thread_uuid
+            THREADS[event] = thread_uuid
 
         else:
-            if cust_event_no in THREADS:
-                del THREADS[cust_event_no]
+            # This cancels the timer for the event
+            if event in THREADS:
+                del THREADS[event]
 
     pygame.time.set_timer = patch_set_timer
 
