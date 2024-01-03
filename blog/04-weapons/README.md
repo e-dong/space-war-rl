@@ -1,4 +1,4 @@
-_This is the weapon's update for v0.4 of Space War RL! I added phasers and photon torpedoes_
+_This is my blog part 2 of 3 for the v0.4 release of Space War RL!_
 
 ## Making a Common Base Class
 
