@@ -79,12 +79,21 @@ class Phaser(BaseWeapon):
 
     def draw_phaser(self):
         """Draws coordinates for the phaser"""
-        for start_pos, end_pos in self.coords:
+        # Calculate change in position since calculation translate all the lines
+        (old_startx, old_starty), _ = self.coords[-1]
+        deltax = self.source_ship.pos[0] - old_startx
+        deltay = self.source_ship.pos[1] - old_starty
+        for (startx, starty), (endx, endy) in self.coords:
+            startx += deltax
+            starty += deltay
+            endx += deltax
+            endy += deltay
+
             pygame.draw.line(
                 self.image,
                 "white",
-                start_pos=start_pos,
-                end_pos=end_pos,
+                start_pos=(startx, starty),
+                end_pos=(endx, endy),
                 width=PHASER_WIDTH,
             )
 
@@ -137,8 +146,10 @@ class Phaser(BaseWeapon):
                 target_group.sprites()[idx_to_kill].kill()
 
             self.coords.append((start_pos, end_pos))
-
-            if rect_idx is None or rect_idx == 1:
+            if (start_pos, end_pos) != (
+                self.hit_detect_info["start_pos"][0],
+                self.hit_detect_info["end_pos"][0],
+            ) and (rect_idx is None or rect_idx == 1):
                 self.coords.append(
                     (
                         self.hit_detect_info["start_pos"][0],

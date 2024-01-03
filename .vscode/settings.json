@@ -27,8 +27,12 @@
     "colliderect",
     "cooldown",
     "DDPG",
+    "deltax",
+    "deltay",
     "Dota",
     "elif",
+    "endx",
+    "endy",
     "gthread",
     "KEYDOWN",
     "keypress",
@@ -44,6 +48,8 @@
     "reinforcementlearning",
     "spacewar",
     "spritecollide",
+    "startx",
+    "starty",
     "USEREVENT",
     "VIDEODRIVER"
   ]
