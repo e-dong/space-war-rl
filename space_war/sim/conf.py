@@ -28,6 +28,7 @@ MAX_FPS = 60
 # screen dimensions for pygame window
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+MAX_VEL = 10
 # The delay in ms to check user movement (e.g. acceleration and rotation)
 MOVEMENT_TIME_DELAY_MS = 80
 # The cooldown period before firing phasers again

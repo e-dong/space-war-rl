@@ -10,12 +10,13 @@ import pygame
 from space_war.sim.base import SpaceEntity
 from space_war.sim.conf import (
     MAX_TORPEDOES_PER_SHIP,
+    MAX_VEL,
     MOVEMENT_TIME_DELAY_MS,
     PHASER_FIRE_CD,
     TORPEDO_FIRE_CD,
     SpaceEntityType,
 )
-from space_war.sim.util import check_overlapping_sprites
+from space_war.sim.util import check_overlapping_sprites, sign
 from space_war.sim.weapon import Phaser, PhotonTorpedo
 
 # TODO: refactor the interaction logic into "actions"
@@ -204,8 +205,18 @@ class HumanShip(BaseShip):
                 )
             if event.key == pygame.constants.K_s:
                 x_vel, y_vel = self.vel
-                x_vel += math.cos(self.ang * math.pi / 180)
-                y_vel += math.sin(self.ang * math.pi / 180)
+                new_x_vel = x_vel + math.cos(self.ang * math.pi / 180)
+                new_y_vel = y_vel + math.sin(self.ang * math.pi / 180)
+                x_vel = (
+                    new_x_vel
+                    if abs(new_x_vel) < MAX_VEL
+                    else sign(new_x_vel) * MAX_VEL
+                )
+                y_vel = (
+                    new_y_vel
+                    if abs(new_y_vel) < MAX_VEL
+                    else sign(new_y_vel) * MAX_VEL
+                )
                 self.vel = (x_vel, y_vel)
                 pygame.time.set_timer(
                     self.acc_repeat_event, MOVEMENT_TIME_DELAY_MS
@@ -232,8 +243,18 @@ class HumanShip(BaseShip):
             self.ang %= 360
         if event.type == self.acc_repeat_event:
             x_vel, y_vel = self.vel
-            x_vel += math.cos(self.ang * math.pi / 180)
-            y_vel += math.sin(self.ang * math.pi / 180)
+            new_x_vel = x_vel + math.cos(self.ang * math.pi / 180)
+            new_y_vel = y_vel + math.sin(self.ang * math.pi / 180)
+            x_vel = (
+                new_x_vel
+                if abs(new_x_vel) < MAX_VEL
+                else sign(new_x_vel) * MAX_VEL
+            )
+            y_vel = (
+                new_y_vel
+                if abs(new_y_vel) < MAX_VEL
+                else sign(new_y_vel) * MAX_VEL
+            )
             self.vel = (x_vel, y_vel)
 
     def _handle_firing_weapon_events(self, event: pygame.event.Event):

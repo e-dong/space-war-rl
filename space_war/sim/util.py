@@ -18,3 +18,7 @@ def check_overlapping_sprites(
         overlap_y = -(sprite_other.rect.bottom - sprite.rect.top)
 
     return overlap_x, overlap_y
+
+
+def sign(num):
+    return -1 if num < 0 else 1
