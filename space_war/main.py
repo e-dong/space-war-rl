@@ -59,9 +59,8 @@ def get_player_sprites(
     return sprites, sprite_cfg
 
 
-async def main():
-    """Entrypoint for starting up the pygame"""
-
+def init():
+    """Initialize sprites, groups, and configuration"""
     # TODO: hydra will make this cleaner
     player_sprites, cfg = get_player_sprites(
         instance_iter=[HumanShip, BaseShip],
@@ -82,6 +81,13 @@ async def main():
     player_target_group = pygame.sprite.Group()
     player_target_group.add(player_sprites)
 
+    return player_sprites, cfg, torpedo_group, player_target_group
+
+
+async def main():
+    """Entrypoint for starting up the pygame"""
+    player_sprites, cfg, torpedo_group, player_target_group = init()
+
     running = True
 
     while running:
@@ -90,6 +96,15 @@ async def main():
             for player in player_sprites:
                 if isinstance(player, HumanShip):
                     player.handle_events(event)
+            if (
+                event.type == pygame.KEYDOWN
+                and event.key == pygame.constants.K_r
+            ):
+                torpedo_group.empty()
+                player_target_group.empty()
+                for sprite_cfg in cfg:
+                    sprite_cfg["group"].empty()
+                player_sprites, cfg, torpedo_group, player_target_group = init()
             # pygame.QUIT event means the user clicked X to close your window
             if event.type == pygame.QUIT:
                 running = False
