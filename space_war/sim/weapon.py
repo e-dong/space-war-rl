@@ -77,12 +77,12 @@ class Phaser(BaseWeapon):
 
         self.coords = []
 
-    def draw_phaser(self):
+    def draw_phaser(self, ship_pos):
         """Draws coordinates for the phaser"""
         # Calculate change in position since calculation translate all the lines
         (old_startx, old_starty), _ = self.coords[-1]
-        deltax = self.source_ship.pos[0] - old_startx
-        deltay = self.source_ship.pos[1] - old_starty
+        deltax = ship_pos[0] - old_startx
+        deltay = ship_pos[1] - old_starty
         for (startx, starty), (endx, endy) in self.coords:
             startx += deltax
             starty += deltay
@@ -257,7 +257,7 @@ class Phaser(BaseWeapon):
         super().update(*args, **kwargs)
         self.update_hit_detector_rects(kwargs["ship_pos"], kwargs["ship_ang"])
         self.handle_collision(target_group=kwargs["target_group"])
-        self.draw_phaser()
+        self.draw_phaser(kwargs["ship_pos"])
 
 
 class PhotonTorpedo(BaseWeapon, SpaceEntity):
