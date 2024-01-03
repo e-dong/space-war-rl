@@ -14,14 +14,12 @@ dev: venv/dev_installed
 prod: venv/wheel_installed
 
 web-dev: pre-web
-	venv/bin/pip install -e .[web]
 	venv/bin/pygbag --width 800 --height 600 --ume_block=0 tmp
 
 web-pack: pre-web
-	venv/bin/pip install .[web]
 	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --archive tmp
 
-pre-web:
+pre-web: dev
 	rm -rf tmp
 	mkdir tmp
 	cp -r space_war tmp
