@@ -101,11 +101,17 @@ class SpaceEntity(pygame.sprite.Sprite):
 
 ## Adding Photon Torpedoes
 
-![photon torpedo closeup](./photon_torpedo_closeup.png)
+<div align="center">
+    <img width="100%" src="photon_torpedo_closeup.png"/>
+    <figcaption>Closeup of firing Photon Torpedoes</figcaption>
+</div>
 
 ## Adding Phasers
 
-![phasers closeup](./phasers_closeup.png)
+<div align="center">
+    <img width="100%" src="phasers_closeup.png" />
+    <figcaption>Closeup of firing Phasers</figcaption>
+</div>
 
 ## Next Steps
 
