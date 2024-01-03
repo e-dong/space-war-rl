@@ -1,4 +1,6 @@
 """Miscellaneous Utility Functions"""
+import math
+
 import pygame
 
 
@@ -22,3 +24,35 @@ def check_overlapping_sprites(
 
 def sign(num):
     return -1 if num < 0 else 1
+
+
+def create_linear_eq(angle, point):
+    """Creates x and y linear equations from angle and a point"""
+    slope_ang = angle % 180
+    slope = (
+        math.tan(slope_ang * (math.pi / 180))
+        if slope_ang < 90
+        else 1 / math.tan(slope_ang * (math.pi / 180))
+    )
+
+    intercept = (
+        point[1] - slope * point[0]
+        if slope_ang < 90
+        else point[0] - slope * point[1]
+    )
+
+    # get y coordinate from x
+    y_linear_eq = (
+        (lambda x: slope * x + intercept)
+        if slope_ang < 90
+        else (lambda x: (x - intercept) / slope)
+    )
+
+    # get x coordinate from y
+    x_linear_eq = (
+        (lambda y: (y - intercept) / slope)
+        if slope_ang < 90
+        else (lambda y: slope * y + intercept)
+    )
+
+    return x_linear_eq, y_linear_eq, slope

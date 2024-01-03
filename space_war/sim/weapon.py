@@ -17,6 +17,7 @@ from space_war.sim.conf import (
     TORPEDO_SPEED,
     SpaceEntityType,
 )
+from space_war.sim.util import create_linear_eq
 
 
 class BaseWeapon(pygame.sprite.Sprite):
@@ -120,7 +121,7 @@ class Phaser(BaseWeapon):
             start_pos = self.hit_detect_info["start_pos"][-1]
 
             for sprite in target_group.sprites():
-                if sprite != self and sprite != self.source_ship:
+                if sprite not in (self, self.source_ship):
                     rect_collide_idx = sprite.rect.collidelist(
                         self.hit_detect_info["rect"]
                     )
@@ -161,32 +162,7 @@ class Phaser(BaseWeapon):
 
     def update_hit_detector_rects(self, ship_pos, ship_ang):
         """Creates hit detection rectangles for the phasers"""
-        slope_ang = ship_ang % 180
-        slope = (
-            math.tan(slope_ang * (math.pi / 180))
-            if slope_ang < 90
-            else 1 / math.tan(slope_ang * (math.pi / 180))
-        )
-
-        intercept = (
-            ship_pos[1] - slope * ship_pos[0]
-            if slope_ang < 90
-            else ship_pos[0] - slope * ship_pos[1]
-        )
-
-        # get y coordinate from x
-        y_linear_eq = (
-            (lambda x: slope * x + intercept)
-            if slope_ang < 90
-            else (lambda x: (x - intercept) / slope)
-        )
-
-        # get x coordinate from y
-        x_linear_eq = (
-            (lambda y: (y - intercept) / slope)
-            if slope_ang < 90
-            else (lambda y: slope * y + intercept)
-        )
+        x_linear_eq, y_linear_eq, slope = create_linear_eq(ship_ang, ship_pos)
 
         # TODO: Make screen wrap around logic iterative
 
