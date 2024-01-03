@@ -315,6 +315,21 @@ class HumanShip(BaseShip):
         event object.
         """
         if not self.alive():
+            pygame.time.set_timer(self.rotate_cc_repeat_event, 0)
+            pygame.time.set_timer(self.rotate_cw_repeat_event, 0)
+            pygame.time.set_timer(self.acc_repeat_event, 0)
+            pygame.time.set_timer(self.fire_phaser_repeat_event, 0)
+            pygame.time.set_timer(self.fire_torpedoes_repeat_event, 0)
+
+            pygame.event.clear(
+                (
+                    self.rotate_cc_repeat_event,
+                    self.rotate_cw_repeat_event,
+                    self.acc_repeat_event,
+                    self.fire_torpedoes_repeat_event,
+                    self.fire_phaser_repeat_event,
+                )
+            )
             return
 
         self._handle_movement_events(event)
