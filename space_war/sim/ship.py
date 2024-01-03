@@ -227,7 +227,7 @@ class HumanShip(BaseShip):
                 pygame.time.set_timer(
                     self.rotate_cw_repeat_event, MOVEMENT_TIME_DELAY_MS
                 )
-            if event.key == pygame.constants.K_s:
+            if event.key == pygame.constants.K_w:
                 x_vel, y_vel = self.vel
                 new_x_vel = x_vel + math.cos(self.ang * math.pi / 180)
                 new_y_vel = y_vel + math.sin(self.ang * math.pi / 180)
@@ -253,7 +253,7 @@ class HumanShip(BaseShip):
             if event.key == pygame.constants.K_d:
                 self.rotate_ccw_lock = True
                 pygame.time.set_timer(self.rotate_cw_repeat_event, 0)
-            if event.key == pygame.constants.K_s:
+            if event.key == pygame.constants.K_w:
                 pygame.time.set_timer(self.acc_repeat_event, 0)
 
         if event.type == self.rotate_cc_repeat_event:
