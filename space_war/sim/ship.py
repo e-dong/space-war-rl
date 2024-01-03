@@ -1,6 +1,7 @@
 """Collection of Ship Classes"""
 import math
 import platform
+import uuid
 from pathlib import Path
 from threading import Thread
 from typing import Union
