@@ -13,15 +13,18 @@ class SpaceEntityType(Enum):
     SHIP, TORPEDO, PHASER = range(3)
 
 
-SpriteConfig = TypedDict(
-    "SpriteConfig",
+# Configuration for the ship
+#   - id: used to uniquely identify the ship and handle unique events
+#   - sprite: reference to the sprite object
+#   - group: The GroupSingle that contains the sprite object
+ShipSpriteConfig = TypedDict(
+    "ShipSpriteConfig",
     {
         "id": str,
         "sprite": pygame.sprite.Sprite,
         "group": pygame.sprite.GroupSingle,
     },
 )
-
 
 # limits FPS to 60
 MAX_FPS = 60

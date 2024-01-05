@@ -8,7 +8,7 @@ from space_war.sim.conf import (
     MAX_FPS,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    SpriteConfig,
+    ShipSpriteConfig,
 )
 from space_war.sim.ship import BaseShip, HumanShip
 
@@ -35,7 +35,7 @@ def get_player_sprites(
     pos_iter: list[tuple[int, int]],
     ang_iter: list[int],
     instance_iter: list[BaseShip],
-) -> tuple[list[BaseShip], list[SpriteConfig]]:
+) -> tuple[list[BaseShip], list[ShipSpriteConfig]]:
     """Initialize player sprites and returns a list of sprites and
     configuration
     """
