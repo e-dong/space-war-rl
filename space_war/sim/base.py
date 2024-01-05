@@ -44,7 +44,7 @@ class SpaceEntity(pygame.sprite.Sprite):
         self.vel = start_vel
         self.ang = start_ang
 
-    def update(self, *_args, **kwargs):
+    def update(self, *_args, **_kwargs):
         """Entrypoint for updating the player state each frame
 
         screen_wrap, pos, and rotation updates can be disabled if set to False
