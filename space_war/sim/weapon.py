@@ -23,12 +23,14 @@ from space_war.sim.util import create_linear_eq
 class BaseWeapon(pygame.sprite.Sprite):
     """Simple base class for weapons. All weapons have a specific duration."""
 
+    # TODO: add a damage attribute to inflict damage to ship's shield on hit
+
     def __init__(self, duration) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.start_time = pygame.time.get_ticks()
         self.max_duration = duration
 
-    def check_expired(self) -> bool:
+    def is_expired(self) -> bool:
         """Returns True if duration of weapon exceeds the max duration"""
         current_duration = pygame.time.get_ticks() - self.start_time
         return current_duration >= self.max_duration
@@ -37,7 +39,7 @@ class BaseWeapon(pygame.sprite.Sprite):
         """Update entrypoint for weapons"""
 
         super().update(*args, **kwargs)
-        if self.check_expired():
+        if self.is_expired():
             self.kill()
 
 
@@ -48,9 +50,8 @@ class Phaser(BaseWeapon):
     ----------
     source_ship: The ship that is firing the phaser
     active: Whether the phaser is actively being fired or not
-    start_time: The start time used to check duration of the phaser
     ship_pos: The center position of the source_ship
-    coords: List of coordinates to draw the phaser
+    coords: List of coordinates to draw the phaser. Ordered by the end to start.
 
     """
 
@@ -63,11 +64,8 @@ class Phaser(BaseWeapon):
     def __init__(self, source_ship) -> None:
         super().__init__(duration=PHASER_MAX_FLIGHT_MS)
         self.source_ship = source_ship
-        self.surf = Surface([SCREEN_WIDTH, SCREEN_HEIGHT]).convert_alpha()
-        self.rect = self.surf.get_rect()
-        self.image = self.surf
-
-        self.target_pos = None
+        self.image = Surface([SCREEN_WIDTH, SCREEN_HEIGHT]).convert_alpha()
+        self.rect = self.image.get_rect()
         self.active = True
         self.hit_detect_info = {
             "rect": [],
@@ -75,12 +73,16 @@ class Phaser(BaseWeapon):
             "end_pos": [],
             "dist": [],
         }
-
         self.coords = []
 
-    def draw_phaser(self, ship_pos):
-        """Draws coordinates for the phaser"""
-        # Calculate change in position since calculation translate all the lines
+    def _draw_phaser(self, ship_pos):
+        """Draws coordinates for the phaser based on coordinates set in
+        self._detect_hit. This is visible to the player.
+
+        """
+
+        # Calculate change in position since calculation
+        # and translate all the lines
         (old_startx, old_starty), _ = self.coords[-1]
         deltax = ship_pos[0] - old_startx
         deltay = ship_pos[1] - old_starty
@@ -98,12 +100,12 @@ class Phaser(BaseWeapon):
                 width=PHASER_WIDTH,
             )
 
-    def handle_collision(
+    def _detect_hit(
         self,
         target_group: pygame.sprite.Group,
     ):
-        """Draws the non-piercing laser and handle collisions with sprites
-        within target group.
+        """Calculates the start and end coordinates of the lines to be
+        shown to the player.
 
           - Collisions with the rectangle will result in drawing a line to the
             center of the sprite in the target group.
@@ -119,8 +121,9 @@ class Phaser(BaseWeapon):
             dist = PHASER_LENGTH
             end_pos = self.hit_detect_info["end_pos"][-1]
             start_pos = self.hit_detect_info["start_pos"][-1]
+            target_sprites = target_group.sprites()
 
-            for sprite in target_group.sprites():
+            for sprite in target_sprites:
                 if sprite not in (self, self.source_ship):
                     rect_collide_idx = sprite.rect.collidelist(
                         self.hit_detect_info["rect"]
@@ -144,7 +147,7 @@ class Phaser(BaseWeapon):
 
                 idx += 1
             if idx_to_kill is not None:
-                target_group.sprites()[idx_to_kill].kill()
+                target_sprites[idx_to_kill].kill()
 
             self.coords.append((start_pos, end_pos))
             if (start_pos, end_pos) != (
@@ -160,18 +163,21 @@ class Phaser(BaseWeapon):
 
             self.active = False
 
-    def update_hit_detector_rects(self, ship_pos, ship_ang):
-        """Creates hit detection rectangles for the phasers"""
+    def _update_hit_detector_rects(self, ship_pos, ship_ang):
+        """Creates hit detection rectangles for the phasers. These are
+        invisible to the player.
+        """
+
         x_linear_eq, y_linear_eq, slope = create_linear_eq(ship_ang, ship_pos)
 
         # TODO: Make screen wrap around logic iterative
 
-        self.target_pos = (
+        target_pos = (
             ship_pos[0] + PHASER_LENGTH * math.cos(ship_ang * math.pi / 180),
             ship_pos[1] + PHASER_LENGTH * math.sin(ship_ang * math.pi / 180),
         )
 
-        x_pos, y_pos = self.target_pos
+        x_pos, y_pos = target_pos
         new_x_pos, new_y_pos = ship_pos
 
         if x_pos >= SCREEN_WIDTH:
@@ -192,7 +198,7 @@ class Phaser(BaseWeapon):
             x_pos = x_linear_eq(y_pos) if slope != 0 else x_pos
             new_y_pos = SCREEN_HEIGHT
 
-        self.target_pos = (x_pos, y_pos)
+        target_pos = (x_pos, y_pos)
 
         # Remove old lines
         self.image.fill("black")
@@ -202,13 +208,13 @@ class Phaser(BaseWeapon):
             self.image,
             pygame.color.Color(0, 0, 0, 0),
             ship_pos,
-            self.target_pos,
+            target_pos,
             PHASER_WIDTH,
         )
-        dist = math.dist(ship_pos, self.target_pos)
+        dist = math.dist(ship_pos, target_pos)
         self.hit_detect_info["rect"].append(rect)
         self.hit_detect_info["start_pos"].append(ship_pos)
-        self.hit_detect_info["end_pos"].append(self.target_pos)
+        self.hit_detect_info["end_pos"].append(target_pos)
         self.hit_detect_info["dist"].append(dist)
         remaining_dist = PHASER_LENGTH - dist
         if math.floor(remaining_dist) > 0:
@@ -231,9 +237,9 @@ class Phaser(BaseWeapon):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
-        self.update_hit_detector_rects(kwargs["ship_pos"], kwargs["ship_ang"])
-        self.handle_collision(target_group=kwargs["target_group"])
-        self.draw_phaser(kwargs["ship_pos"])
+        self._update_hit_detector_rects(kwargs["ship_pos"], kwargs["ship_ang"])
+        self._detect_hit(target_group=kwargs["target_group"])
+        self._draw_phaser(kwargs["ship_pos"])
 
 
 class PhotonTorpedo(BaseWeapon, SpaceEntity):
@@ -259,6 +265,8 @@ class PhotonTorpedo(BaseWeapon, SpaceEntity):
         pygame.draw.polygon(self.image, "white", [[7, 5], [7, 9], [11, 10]], 1)
         pygame.draw.line(self.image, "white", (3, 9), (7, 9))
         pygame.draw.line(self.image, "white", (5, 5), (5, 11))
+        # Drawn like a christmas tree, so need to rotate it by 90 degrees.
+        self.surf = pygame.transform.rotate(self.surf, -90)
 
         # Apply torpedoes velocity on ship's velocity
         x_vel, y_vel = self.vel
@@ -269,10 +277,6 @@ class PhotonTorpedo(BaseWeapon, SpaceEntity):
     def update(self, *args, **kwargs):
         SpaceEntity.update(self, *args, **kwargs)
         BaseWeapon.update(self, *args, **kwargs)
-        # Torpedo needs to be rotated an additional 90 degrees
-        # due to the orientation it was originally drawn
-        self.image = pygame.transform.rotate(self.surf, -(self.ang + 90))
-        self.rect = self.image.get_rect(center=self.pos)
 
         # group and collision management
         for sprite in kwargs["target_group"].sprites():
