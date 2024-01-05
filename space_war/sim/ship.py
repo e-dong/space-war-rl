@@ -1,4 +1,5 @@
 """Collection of Ship Classes"""
+
 import math
 import platform
 import uuid
@@ -27,6 +28,7 @@ from space_war.sim.weapon import Phaser, PhotonTorpedo
 def patch_timer():
     """Custom monkey patch of pygame.time.set_timer function so it works in the
     pygame-wasm environment.
+
     """
     # pylint: disable-next=import-outside-toplevel
     import asyncio
@@ -100,6 +102,7 @@ class BaseShip(SpaceEntity):
     phaser_group: Group containing its fired phaser
     phaser_last_fired: The number of ticks since firing a phaser
     torpedo_last_fired: The number of ticks since firing a torpedo
+
     """
 
     player_id: int

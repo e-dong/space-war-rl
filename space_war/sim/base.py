@@ -19,6 +19,7 @@ class SpaceEntity(pygame.sprite.Sprite):
     pos: The x,y of the rect's center position on the screen
     vel: The velocity of the space entity
     ang: The angle in degrees representing the direction the ship is facing
+
     """
 
     entity_type: SpaceEntityType
@@ -48,6 +49,7 @@ class SpaceEntity(pygame.sprite.Sprite):
         """Entrypoint for updating the player state each frame
 
         screen_wrap, pos, and rotation updates can be disabled if set to False
+
         """
         x_pos, y_pos = self.pos
         x_vel, y_vel = self.vel

@@ -1,4 +1,5 @@
 """Miscellaneous Utility Functions"""
+
 import math
 
 import pygame

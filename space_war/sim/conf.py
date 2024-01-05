@@ -1,4 +1,5 @@
 """Constants / Configuration for game"""
+
 from enum import Enum
 from typing import TypedDict
 

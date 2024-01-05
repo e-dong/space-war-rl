@@ -37,7 +37,6 @@ class BaseWeapon(pygame.sprite.Sprite):
 
     def update(self, *args: Any, **kwargs: Any):
         """Update entrypoint for weapons"""
-
         super().update(*args, **kwargs)
         if self.is_expired():
             self.kill()
