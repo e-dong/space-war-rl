@@ -25,16 +25,19 @@ from space_war.sim.weapon import Phaser, PhotonTorpedo
 
 
 def patch_timer():
+    """Custom monkey patch of pygame.time.set_timer function so it works in the
+    pygame-wasm environment.
+    """
     # pylint: disable-next=import-outside-toplevel
     import asyncio
 
-    # pylint: disable-next=import-error,import-outside-toplevel
+    # pylint: disable-next=import-error,import-outside-toplevel,unused-import
     import aio.gthread
 
     # Global var to keep track of timer threads
     #   - key: event type
     #   - value: thread uuid
-    THREADS = {}
+    timer_threads_dict = {}
 
     def patch_set_timer(
         event: Union[int, pygame.event.Event], millis: int, loops: int = 0
@@ -49,18 +52,18 @@ def patch_timer():
             """The thread's target function to handle the timer
 
             Early exit conditions:
-            - event loop is closed
-            - event type is no longer in THREADS dictionary
-            - the thread's uuid is not the latest one
-            - Max loop iterations if loops param is not zero
+              - event loop is closed
+              - event type is no longer in timer_threads_dict
+              - the thread's uuid is not the latest one
+              - Max loop iterations if loops param is not zero
             """
             loop_counter = 0
             while True:
                 await asyncio.sleep(dlay)
                 if (
                     event_loop.is_closed()
-                    or event not in THREADS
-                    or THREADS[event] != thread_uuid
+                    or event not in timer_threads_dict
+                    or timer_threads_dict[event] != thread_uuid
                     or (loops and loop_counter >= loops)
                 ):
                     break
@@ -73,12 +76,12 @@ def patch_timer():
             # stale threads will be terminated
             thread_uuid = uuid.uuid4()
             Thread(target=fire_event, args=[thread_uuid]).start()
-            THREADS[event] = thread_uuid
+            timer_threads_dict[event] = thread_uuid
 
         else:
             # This cancels the timer for the event
-            if event in THREADS:
-                del THREADS[event]
+            if event in timer_threads_dict:
+                del timer_threads_dict[event]
 
     pygame.time.set_timer = patch_set_timer
 
@@ -88,12 +91,23 @@ if platform.system().lower() == "emscripten":
 
 
 class BaseShip(SpaceEntity):
-    """Defines common ship functionality"""
+    """Defines common ship functionality.
+
+    Attributes
+    ----------
+    player_id: Used uniquely identify the ship
+    torpedo_group: Group containing its fired torpedoes
+    phaser_group: Group containing its fired phaser
+    phaser_last_fired: The number of ticks since firing a phaser
+    torpedo_last_fired: The number of ticks since firing a torpedo
+    """
 
     player_id: int
     torpedo_group: pygame.sprite.Group
     phaser_group: pygame.sprite.GroupSingle
     phaser: pygame.sprite.Sprite
+    phaser_last_fired: int
+    torpedo_last_fired: int
 
     def __init__(
         self,
@@ -115,7 +129,6 @@ class BaseShip(SpaceEntity):
         self.phaser = None
         self.phaser_last_fired = None
         self.torpedo_last_fired = None
-        self.last_collided_ship = None
 
     def draw_groups(self, surface: pygame.Surface):
         """Draws the torpedo and phaser group to the surface"""
@@ -130,7 +143,7 @@ class BaseShip(SpaceEntity):
             target_group=target_group, ship_ang=self.ang, ship_pos=self.pos
         )
 
-    def check_phaser_on_cooldown(self) -> bool:
+    def _check_phaser_on_cooldown(self) -> bool:
         """Checks if the phaser is actively being fired"""
         if not self.phaser_last_fired:
             return False
@@ -139,7 +152,7 @@ class BaseShip(SpaceEntity):
             return False
         return True
 
-    def check_torpedo_on_cooldown(self) -> bool:
+    def _check_torpedo_on_cooldown(self) -> bool:
         """Checks if the phaser is actively being fired"""
         if not self.torpedo_last_fired:
             return False
@@ -149,10 +162,9 @@ class BaseShip(SpaceEntity):
             return False
         return True
 
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-
-        for sprite in kwargs["target_group"].sprites():
+    def _handle_ship_collisions(self, target_group):
+        """Updates velocity based on ship on ship collisions"""
+        for sprite in target_group.sprites():
             if (
                 sprite != self
                 and self.rect.colliderect(sprite.rect)
@@ -161,6 +173,8 @@ class BaseShip(SpaceEntity):
                 self_vel_x, self_vel_y = self.vel
                 other_vel_x, other_vel_y = sprite.vel
 
+                # preserve 20% velocity and gain 75% of the other ship's
+                # velocity
                 new_self_vel_x = (self_vel_x * 0.2) + (other_vel_x * 0.75)
                 new_self_vel_y = (self_vel_y * 0.2) + (other_vel_y * 0.75)
                 new_other_vel_x = (other_vel_x * 0.2) + (self_vel_x * 0.75)
@@ -169,9 +183,7 @@ class BaseShip(SpaceEntity):
                 self.vel = (new_self_vel_x, new_self_vel_y)
                 sprite.vel = (new_other_vel_x, new_other_vel_y)
 
-                self.last_collided_ship = pygame.time.get_ticks()
-
-                # Detect any overlap and move the ships
+                # detect any overlap and move the ships
                 overlap_x, overlap_y = check_overlapping_sprites(self, sprite)
 
                 if overlap_x:
@@ -182,10 +194,23 @@ class BaseShip(SpaceEntity):
                         sprite.pos[1] + sprite.vel[1],
                     )
 
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self._handle_ship_collisions(kwargs["target_group"])
+
 
 class HumanShip(BaseShip):
     """Represents the ship controlled by a human player.
     User input is captured using the event loop in handle_events.
+
+    Attributes
+    ----------
+    rotate_cc_repeat_event: The event where rotate cc key is held down
+    rotate_cw_repeat_event: The event where the rotate cw key is held down
+    acc_repeat_event: The event where the accelerate key is held down
+    fire_torpedoes_repeat_event: The event where the fire torpedoes key is held down
+    fire_phaser_repeat_event: The event where the fire phasers key is held down
+
     """
 
     rotate_cc_repeat_event: pygame.USEREVENT
@@ -205,6 +230,8 @@ class HumanShip(BaseShip):
         self.rotate_ccw_lock = False
 
         # create custom event to check user input
+        # ships should have unique player ids to ensure events get handled
+        # correctly
         self.rotate_cc_repeat_event = pygame.USEREVENT + player_id + 1
         self.rotate_cw_repeat_event = pygame.USEREVENT + player_id + 2
         self.acc_repeat_event = pygame.USEREVENT + player_id + 3
@@ -212,7 +239,11 @@ class HumanShip(BaseShip):
         self.fire_phaser_repeat_event = pygame.USEREVENT + player_id + 5
 
     def _handle_movement_events(self, event: pygame.event.Event):
-        """Handle ship movement and rotation"""
+        """Handle ship movement and rotation.
+
+        Keybindings are hard coded for now. It would be good to make this config
+        driven.
+        """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.constants.K_a:
                 self.rotate_ccw_lock = True
@@ -282,14 +313,19 @@ class HumanShip(BaseShip):
             self.vel = (x_vel, y_vel)
 
     def _handle_firing_weapon_events(self, event: pygame.event.Event):
-        """Handles firing phasers and photon torpedoes"""
+        """Handles firing phasers and photon torpedoes.
+
+        Keybindings are hard coded for now. It would be good to make this config
+        driven.
+
+        """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.constants.K_q:
                 pygame.time.set_timer(
                     self.fire_phaser_repeat_event,
                     PHASER_FIRE_CD,
                 )
-                if not self.check_phaser_on_cooldown():
+                if not self._check_phaser_on_cooldown():
                     self.phaser = Phaser(source_ship=self)
                     self.phaser_group.add(self.phaser)
                     self.phaser_last_fired = pygame.time.get_ticks()
@@ -300,7 +336,7 @@ class HumanShip(BaseShip):
                 )
                 if (
                     len(self.torpedo_group) < MAX_TORPEDOES_PER_SHIP
-                    and not self.check_torpedo_on_cooldown()
+                    and not self._check_torpedo_on_cooldown()
                 ):
                     self.torpedo_group.add(
                         PhotonTorpedo(
@@ -337,7 +373,10 @@ class HumanShip(BaseShip):
 
         This method should be called from the event loop to pass the
         event object.
+
         """
+
+        # cleanup timer events
         if not self.alive():
             pygame.time.set_timer(self.rotate_cc_repeat_event, 0)
             pygame.time.set_timer(self.rotate_cw_repeat_event, 0)

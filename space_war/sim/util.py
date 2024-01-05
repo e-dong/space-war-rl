@@ -23,6 +23,7 @@ def check_overlapping_sprites(
 
 
 def sign(num):
+    """Calculates the sign of a number"""
     return -1 if num < 0 else 1
 
 
