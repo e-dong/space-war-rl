@@ -1,6 +1,6 @@
 _This is my blog part 1 of 3 for the v0.4 release of Space War RL!_
 
-Normally games made with `pygame` are not playable from the web. They can only be run from the command line or use [PyInstaller](https://pyinstaller.org/en/stable/) or [cx_Freeze](https://cx-freeze.readthedocs.io/en/latest/) to create a standalone executable (e.g. .exe file)
+Normally games made with `pygame` are not playable from the web. They can only be run from the command line or use [PyInstaller](https://pyinstaller.org/en/stable/) or [cx_Freeze](https://cx-freeze.readthedocs.io/en/latest/) to create a standalone executable.
 
 I recently discovered [pygbag](https://pypi.org/project/pygbag/) that allows python code to run in a web browser.
 
@@ -22,16 +22,17 @@ Pygbag is a C runtime linked to cython-wasm compiled to WebAssembly by Emscripte
 
 ### Patching pygame.time.set_timer
 
-Due to [pygbag#16](https://github.com/pygame-web/pygbag/issues/16), the built-in function does not work correctly in the `pygame-wasm` environment.
+Due to [pygbag#16](https://github.com/pygame-web/pygbag/issues/16), the built-in function does not work correctly in the `pygame-wasm` environment. I noticed the patch to `set_timer` was buggy, so I made an improvement to the patch by handling other behaviors mentioned in the [docs](https://pyga.me/docs/ref/time.html#pygame.time.set_timer) (e.g. disabling the timer and discarding an old timer for the same event).
 
-I made an improvement to the patch by handling other behaviors mentioned in the [docs](https://pyga.me/docs/ref/time.html#pygame.time.set_timer):
+#### Implementation Details
+
+I created a `THREADS` dictionary to keep track of all the spawned threads. It is keyed by the event type and contains the uuid of the thread. A delay of 0 will cancel the timer by deleting the event type from the dictionary, which causes the while loop to break in the `fire_event` function. If there are multiple threads for the same event type, only the latest one is considered due to this condition in the if block: `THREADS[event] != thread_uuid`.
+
+This is only a temporary workaround until a fix is completed upstream. See below for the code example:
 
 ```python
 def patch_timer():
-    # pylint: disable-next=import-outside-toplevel
     import asyncio
-
-    # pylint: disable-next=import-error,import-outside-toplevel
     import aio.gthread
 
     # Global var to keep track of timer threads
@@ -89,7 +90,3 @@ def patch_timer():
 if platform.system().lower() == "emscripten":
     patch_timer()
 ```
-
-I created a `THREADS` dictionary to keep track of all the spawned threads. It is keyed by the event type and contains the uuid of the thread. A delay of 0 will cancel the timer by deleting the event type from the dictionary, which causes the while loop to break in the `fire_event` function. If there are multiple threads for the same event type, only the latest one is considered due to this condition in the if block: `THREADS[event] != thread_uuid`.
-
-This is only a temporary workaround until a fix is completed upstream.
