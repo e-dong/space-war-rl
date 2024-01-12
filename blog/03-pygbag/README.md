@@ -28,7 +28,7 @@ Due to [pygbag#16](https://github.com/pygame-web/pygbag/issues/16), the built-in
 
 I created a `THREADS` dictionary to keep track of all the spawned threads. It is keyed by the event type and contains the uuid of the thread. A delay of 0 will cancel the timer by deleting the event type from the dictionary, which causes the while loop to break in the `fire_event` function. If there are multiple threads for the same event type, only the latest one is considered due to this condition in the if block: `THREADS[event] != thread_uuid`.
 
-This is only a temporary workaround until a fix is completed upstream. See below for the code example:
+This is only a temporary workaround until a fix is released upstream. See below for the code example:
 
 ```python
 def patch_timer():
