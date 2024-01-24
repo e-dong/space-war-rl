@@ -40,7 +40,8 @@ class SpaceEntity(pygame.sprite.Sprite):
 ```
 
 <div align="center">
-  <figcaption><i>The <code>SpaceEntity</code> base class represents flying objects in space. See <a href="">space_war/sim/base.py</a> for the full source</i>
+  <figcaption><i>The <code>SpaceEntity</code> base class represents flying objects in space. 
+  See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/base.py">space_war/sim/base.py</a> for the full source</i>
   </figcaption>
 </div>
 
@@ -68,7 +69,7 @@ class BaseWeapon(pygame.sprite.Sprite):
 ```
 
 <div align="center">
-  <figcaption><i>See <a href="">space_war/sim/weapon.py</a> for the full source</i>
+  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/weapon.py">space_war/sim/weapon.py</a> for the full source</i>
   </figcaption>
 </div>
 
@@ -96,9 +97,11 @@ pygame.draw.line(self.image, "white", (5, 5), (5, 11))
   <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/39tr9okbnouwcx83xod4.png"/> <figcaption><i>Closeup of firing Photon Torpedoes</i></figcaption>
 </div>
 
+Each torpedo has a max duration unless it hits another object. There can only be a max of 7 per ship flying at a time (According to the emulator).
+
 ## Adding Phasers
 
-Adding phasers on the other hand was more complicated than I initially thought. I ended up making 3 revisions of the implementation. I started using the `SpaceEntity` base class and realized screen wrap-around won't work correctly. The base class assumes there is one rectangle. This works fine to represent individual ships and torpedoes. For screen wrap-around to work correctly, I need at least 2 rectangles. One is drawn to the edge of the screen and the rest continues on the other side of the screen.
+Adding phasers on the other hand was more complicated than I initially thought. I ended up making 3 revisions of the implementation. I started using the `SpaceEntity` base class and realized screen wrap-around won't work correctly. The base class assumes there is one rectangle. This works fine to represent individual ships and torpedoes. For screen wrap-around to work correctly, I need at least 2 rectangles. One is drawn to the edge of the screen and the rest continues on the other side of the screen. Another big difference from the torpedo is the size of the surface. The phaser's surface is the same size as the screen. This made the calculations easier for drawing the line, since I could use absolute coordinates. The torpedo is a 12x12 surface and it is rotated based on the ship's angle upon firing.
 
 My implementation consists of three steps:
 
@@ -174,11 +177,20 @@ This is what the `_handle_firing_weapon_events` function looks like:
                 )
 ```
 
+<div align="center">
+  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/ship.py">space_war/sim/ship.py</a> for the full source</i>
+  </figcaption>
+</div>
+
 The final step is to detect collisions between the weapons and ships. For this iteration, one hit with a weapon will result in death (removing the sprite from its group). Torpedoes can collide with other torpedoes and ships. Phasers can only collide with torpedoes and the other ship.
 
 <div align="center">
   <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/t6xz7amzim5g5vu6399v.gif" /> <figcaption><i>GIF of weapons demo</i></figcaption>
 </div>
+
+## Lessons Learned
+
+While implementing the weapons, I have a better understanding how inheritance works in python and the difference between the surface and rectangle. The [surface](https://pyga.me/docs/ref/surface.html) is the visible portion of drawing pixels to the screen and the [rectangle](https://pyga.me/docs/ref/rect.html) is the coordinate data. In this case, I'm using the rectangle for movement and collision detection. I also learned more about [sprite groups](https://pyga.me/docs/ref/sprite.html#pygame.sprite.Group) and how it makes it easy to manage multiple sprite instances. You can see [space_war/main.py](https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/main.py) for how I'm initializing the groups.
 
 ## Next Steps
 
