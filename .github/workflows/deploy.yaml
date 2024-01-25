@@ -9,7 +9,7 @@ env:
   ITCH_GAME_ID: spacewar-dev
 jobs:
   deploy:
-    name: Upload to Itch
+    name: Upload to Itch ${{ env.ITCH_GAME_ID }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -17,7 +17,6 @@ jobs:
         channel:
           - web
     runs-on: ubuntu-latest
-    name: Deploy - Itch.io - Dev
     steps:
       - run: make web-pack
       - uses: actions/download-artifact@v2.0.8
