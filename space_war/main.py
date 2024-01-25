@@ -71,7 +71,7 @@ def init():
             ),
             (
                 screen.get_width() - screen.get_width() / 4,
-                screen.get_height() - screen.get_height() / 4,
+                screen.get_height() / 4,
             ),
         ],
         ang_iter=[0, 180],
