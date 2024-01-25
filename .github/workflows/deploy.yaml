@@ -17,6 +17,8 @@ jobs:
         channel:
           - web
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: make web-pack
       - uses: actions/download-artifact@v2.0.8
         with:
