@@ -17,7 +17,7 @@ web-dev: pre-web
 	venv/bin/pygbag --width 800 --height 600 --ume_block=0 tmp
 
 web-pack: pre-web
-	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --archive tmp
+	venv/bin/pygbag --width 800 --height 600 --ume_block=0 --html --build tmp
 
 pre-web: dev
 	rm -rf tmp
