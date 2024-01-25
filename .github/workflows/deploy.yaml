@@ -16,7 +16,6 @@ jobs:
       matrix:
         channel:
           - web
-    runs-on: ubuntu-latest
     steps:
       - run: make web-pack
       - uses: actions/download-artifact@v2.0.8
