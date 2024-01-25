@@ -97,11 +97,11 @@ pygame.draw.line(self.image, "white", (5, 5), (5, 11))
   <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/39tr9okbnouwcx83xod4.png"/> <figcaption><i>Closeup of firing Photon Torpedoes</i></figcaption>
 </div>
 
-Each torpedo has a max duration unless it hits another object. There can only be a max of 7 per ship flying at a time (According to the emulator).
+Each torpedo flies for its max duration unless it hits another object. There can only be a max of 7 per ship flying at a time (According to the emulator).
 
 ## Adding Phasers
 
-Adding phasers on the other hand was more complicated than I initially thought. I ended up making 3 revisions of the implementation. I started using the `SpaceEntity` base class and realized screen wrap-around won't work correctly. The base class assumes there is one rectangle. This works fine to represent individual ships and torpedoes. For screen wrap-around to work correctly, I need at least 2 rectangles. One is drawn to the edge of the screen and the rest continues on the other side of the screen. Another big difference from the torpedo is the size of the surface. The phaser's surface is the same size as the screen. This made the calculations easier for drawing the line, since I could use absolute coordinates. The torpedo is a 12x12 surface and it is rotated based on the ship's angle upon firing.
+Adding phasers on the other hand was more complicated than I initially thought. I ended up making 3 revisions of the implementation. I started using the `SpaceEntity` base class and realized screen wrap-around won't work correctly. The base class assumes there is one rectangle. This works fine to represent individual ships and torpedoes. For screen wrap-around to work correctly, I need at least 2 rectangles. One is drawn to the edge of the screen and the rest continues on the other side of the screen. Another big difference from the ship and torpedo is the size of the surface. The phaser's surface is the same size as the screen. This made the calculations easier for drawing the line, since I could use absolute coordinates. The torpedo is a 12x12 surface and it is rotated based on the ship's angle upon firing.
 
 My implementation consists of three steps:
 
