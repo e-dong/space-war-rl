@@ -9,7 +9,7 @@ env:
   ITCH_GAME_ID: spacewar-dev
 jobs:
   deploy:
-    name: Upload to Itch ${{ env.ITCH_GAME_ID }}
+    name: Upload to Itch
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
