@@ -17,7 +17,7 @@ jobs:
         channel:
           - web
     runs-on: ubuntu-latest
-    name: Deploy - Itch.io ${{env.ITCH_GAME_ID}}
+    name: Deploy - Itch.io - Dev
     steps:
       - run: make web-pack
       - uses: actions/download-artifact@v2.0.8
