@@ -17,8 +17,13 @@ jobs:
         channel:
           - web
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: "3.11.x"
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: "x64"
       - run: make web-pack
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
