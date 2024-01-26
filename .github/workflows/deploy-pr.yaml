@@ -25,11 +25,12 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
           architecture: "x64"
       - run: make web-pack
+      - run: echo "$(python setup.py --version)-dev" > version.txt
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
-          gameData: ./tmp/build/web
+          gameData: tmp/build/web
           itchUsername: ${{env.ITCH_USERNAME}}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
-          buildNumber: ${{ needs.version.outputs.version_hash }}
+          buildNumberFile: version.txt
