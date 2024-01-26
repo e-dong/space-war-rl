@@ -23,8 +23,6 @@ web-pack: pre-web
 	  --ume_block=0 \
 	  --archive \
 	  tmp
-	cp tmp/space_war/sim/assets/player_0.png tmp/build/web/favicon.png
-
 
 pre-web: dev
 	rm -rf tmp
