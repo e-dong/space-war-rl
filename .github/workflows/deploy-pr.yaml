@@ -25,6 +25,8 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
           architecture: "x64"
       - run: make web-pack
+      - name: set-env
+        run: bash .github/workflows/env.sh
       - run: echo "$(python setup.py --version)-dev" > version.txt
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
