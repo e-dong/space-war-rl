@@ -15,6 +15,7 @@ BUILD_NUM=$(python setup.py --version)
 
 if [[ "${event_name}" == "pull_request" ]]; then
   git_branch="${GITHUB_HEAD_REF}"
+  git fetch
   git_hash="$(git rev-parse --short "origin/${git_branch}")"
 
   if [[ ${?} -ne 0 ]]; then
