@@ -50,6 +50,50 @@ new_other_vel_y = (other_vel_y * 0.2) + (self_vel_y * 0.75)
   <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/yokxs0dhivrwszmzjc7s.gif" /> <figcaption><i><b>Ship collisions v2</b>: Maintain 20% of original velocity and gain 75% of the other ship's velocity</i></figcaption>
 </div>
 
+One major problem I ran into is when the ship overlaps with each other.
+
+ADD VIDEO SHOWING PROBLEM
+
+I created this util function to determine the amount of overlap.
+
+```python
+def check_overlapping_sprites(
+    sprite: pygame.sprite.Sprite, sprite_other: pygame.sprite.Sprite
+):
+    """Returns the amount of overlap between 2 sprites"""
+    overlap_x, overlap_y = (0, 0)
+    if sprite.rect.centerx < sprite_other.rect.centerx:
+        overlap_x = sprite.rect.right - sprite_other.rect.left
+    elif sprite.rect.centerx > sprite_other.rect.centerx:
+        overlap_x = -(sprite_other.rect.right - sprite.rect.left)
+
+    if sprite.rect.centery < sprite_other.rect.centery:
+        overlap_y = sprite.rect.bottom - sprite_other.rect.top
+    elif sprite.rect.centery > sprite_other.rect.centery:
+        overlap_y = -(sprite_other.rect.bottom - sprite.rect.top)
+
+    return overlap_x, overlap_y
+```
+
+If I update the position of the sprites to not overlap, it is very jarring.
+
+ADD VIDEO OF SHOWING JARING
+
+To make this more natural, if there is any overlap, move the sprites naturally by using their velocities.
+
+```python
+# detect any overlap and move the ships
+overlap_x, overlap_y = check_overlapping_sprites(self, sprite)
+
+if overlap_x:
+    sprite.pos = (sprite.pos[0] + sprite.vel[0], sprite.pos[1])
+if overlap_y:
+    sprite.pos = (
+        sprite.pos[0],
+        sprite.pos[1] + sprite.vel[1],
+    )
+```
+
 My goal isn't to make a physics accurate simulation, so this will be good enough. I may use Unreal or Unity in the future to take advantage of the physics engine.
 
 ## Next Up
