@@ -1,2 +1,3 @@
 #!/bin/bash
-echo "hi"
+
+echo "version=$(python setup.py --version)-dev" >> "$GITHUB_ENV"

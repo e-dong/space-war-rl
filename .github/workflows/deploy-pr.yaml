@@ -27,7 +27,8 @@ jobs:
       - run: make web-pack
       - name: set-env
         run: bash .github/workflows/env.sh
-      - run: echo "$(python setup.py --version)-dev" > version.txt
+      - name: debug-env
+        run: echo $version
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
@@ -35,4 +36,4 @@ jobs:
           itchUsername: ${{env.ITCH_USERNAME}}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
-          buildNumberFile: version.txt
+          buildNumberFile: $version
