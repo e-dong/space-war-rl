@@ -14,11 +14,11 @@ ITCH_GAME_ID=spacewar
 BUILD_NUM=$(python setup.py --version)
 
 if [[ "${event_name}" == "pull_request" ]]; then
-  short_commit_sha="${GITHUB_SHA::6}"
-  branch="$(echo $GITHUB_REF | cut -d'/' -f 3)"
+  git_hash=$(git rev-parse --short "$GITHUB_SHA")
+  git_branch=${GITHUB_REF#refs/heads/}
 
   ITCH_GAME_ID="${ITCH_GAME_ID}-dev"
-  BUILD_NUM="${BUILD_NUM}-${branch}-${short_commit_sha}"
+  BUILD_NUM="${BUILD_NUM}-${git_branch}-${git_hash}"
 fi
 
 echo "build_num: ${BUILD_NUM}"
