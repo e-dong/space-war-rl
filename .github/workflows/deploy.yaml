@@ -1,12 +1,12 @@
-name: Deploy
+name: Deploy PR
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
-env:
-  ITCH_USERNAME: e-dong
-  ITCH_GAME_ID: spacewar
 jobs:
   deploy:
     name: Upload to Itch
@@ -25,12 +25,14 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
           architecture: "x64"
       - run: make web-pack
-      - run: echo "$(python setup.py --version)" > version.txt
+      - name: set-env
+        id: env-output
+        run: bash .github/workflows/env.sh ${{ github.event_name }}
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
-          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          butlerApiKey: ${{ secrets.BUTLER_API_KEY }}
           gameData: tmp/build/web
-          itchUsername: ${{env.ITCH_USERNAME}}
+          itchUsername: ${{ env.ITCH_USERNAME }}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
-          buildNumberFile: version.txt
+          buildNumber: ${{ env.BUILD_NUM }}
