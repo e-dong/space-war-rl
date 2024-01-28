@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - main
-env:
-  ITCH_USERNAME: e-dong
-  ITCH_GAME_ID: spacewar-dev
 jobs:
   deploy:
     name: Upload to Itch
@@ -29,12 +26,10 @@ jobs:
         id: env-output
         run: bash .github/workflows/env.sh
       - uses: KikimoraGames/itch-publish@v0.0.3
-        env:
-          BUILD_NUM: ${{ env.version }}
         with:
-          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          butlerApiKey: ${{ secrets.BUTLER_API_KEY }}
           gameData: tmp/build/web
-          itchUsername: ${{env.ITCH_USERNAME}}
+          itchUsername: ${{ env.ITCH_USERNAME }}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
           buildNumber: ${{ env.BUILD_NUM }}
