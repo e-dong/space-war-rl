@@ -1,5 +1,7 @@
 _This is my blog part 1 of 3 for the v0.4 release of Space War RL!_
 
+<hr>
+
 Normally games made with `pygame` are not playable from the web. They can only be run from the command line or use [PyInstaller](https://pyinstaller.org/en/stable/) or [cx_Freeze](https://cx-freeze.readthedocs.io/en/latest/) to create a standalone executable.
 
 I recently discovered [pygbag](https://pypi.org/project/pygbag/) that allows python code to run in a web browser.

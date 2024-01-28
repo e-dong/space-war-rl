@@ -1,5 +1,7 @@
 _This is my blog part 2 of 3 for the v0.4 release of Space War RL!_
 
+<hr>
+
 ## Making a Common Base Class
 
 The `HumanShip` class contains logic for applying screen wrap-around, velocity, and rotation. Since I want the other objects to have this same logic, I can extract this into a common base class.

@@ -1,5 +1,7 @@
 _This is an update for v0.3 of Space War RL! I made more updates to the player movement._
 
+<hr>
+
 ## Making Ship Rotation more Discrete
 
 In the emulator, I noticed each keypress of the rotation keybinding would rotate the ship by 22.5 degrees (4 key presses for a 90 degree turn).
