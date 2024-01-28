@@ -16,7 +16,7 @@ BUILD_NUM=$(python setup.py --version)
 if [[ "${event_name}" == "pull_request" ]]; then
   git fetch
   git_branch="${GITHUB_HEAD_REF}"
-  git_hash="$(git rev-parse --short "${git_branch}")"
+  git_hash="$(git rev-parse --short "origin/${git_branch}")"
 
   ITCH_GAME_ID="${ITCH_GAME_ID}-dev"
   BUILD_NUM="${BUILD_NUM}-${git_branch}-${git_hash}"
