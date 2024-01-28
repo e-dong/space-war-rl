@@ -13,7 +13,7 @@ game:
 dev: venv/dev_installed
 prod: venv/wheel_installed
 
-web-dev: pre-web
+web-dev: dev pre-web
 	venv/bin/pygbag --width 800 --height 600 --ume_block=0 tmp
 
 web-pack: pre-web
@@ -24,7 +24,7 @@ web-pack: pre-web
 	  --archive \
 	  tmp
 
-pre-web: dev
+pre-web: prod
 	rm -rf tmp
 	mkdir tmp
 	cp -r space_war tmp
