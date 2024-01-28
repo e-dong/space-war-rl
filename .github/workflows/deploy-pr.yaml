@@ -26,12 +26,15 @@ jobs:
           architecture: "x64"
       - run: make web-pack
       - name: set-env
+        id: env-output
         run: bash .github/workflows/env.sh
       - uses: KikimoraGames/itch-publish@v0.0.3
+        env:
+          BUILD_NUM: ${{ steps.env-output.outputs.version }}
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
           gameData: tmp/build/web
           itchUsername: ${{env.ITCH_USERNAME}}
           itchGameId: ${{ env.ITCH_GAME_ID }}
           buildChannel: ${{ matrix.channel }}
-          buildNumber: $version
+          buildNumber: ${{ env.BUILD_NUM }}
