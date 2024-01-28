@@ -30,7 +30,7 @@ jobs:
         run: bash .github/workflows/env.sh
       - uses: KikimoraGames/itch-publish@v0.0.3
         env:
-          BUILD_NUM: $version
+          BUILD_NUM: ${{ env.version }}
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
           gameData: tmp/build/web
