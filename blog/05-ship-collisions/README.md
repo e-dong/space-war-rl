@@ -52,7 +52,9 @@ new_other_vel_y = (other_vel_y * 0.2) + (self_vel_y * 0.75)
 
 One major problem I ran into is when the ship overlaps with each other.
 
-ADD VIDEO SHOWING PROBLEM
+<div align="center">
+  <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/bb9albudy8rxiijlqtwy.gif" /> <figcaption><i>Sprite overlap issue</i></figcaption>
+</div>
 
 I created this util function to determine the amount of overlap.
 
@@ -75,9 +77,24 @@ def check_overlapping_sprites(
     return overlap_x, overlap_y
 ```
 
-If I update the position of the sprites to not overlap, it is very jarring.
+If I update the position of the sprites to not overlap, it is a bit jarring and unnatural.
 
-ADD VIDEO OF SHOWING JARING
+```python
+ # detect any overlap and move the ships
+ overlap_x, overlap_y = check_overlapping_sprites(self, sprite)
+
+sprite.pos = (sprite.pos[0] + overlap_x, sprite.pos[1] + overlap_y)
+```
+
+<div align="center">
+  <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xne368jlpi39kylgfwq7.gif" /> <figcaption><i>Sprite overlap fix v1</i></figcaption>
+</div>
+
+Looking at the emulator for comparison and I noticed it is doing something similar. Looks like both ships' positions are adjusted.
+
+<div align="center">
+  <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vzta61m1wcwctc1z979s.gif" /> <figcaption><i>Ship collisions in Emulator</i></figcaption>
+</div>
 
 To make this more natural, if there is any overlap, move the sprites naturally by using their velocities.
 
@@ -93,6 +110,10 @@ if overlap_y:
         sprite.pos[1] + sprite.vel[1],
     )
 ```
+
+<div align="center">
+  <img width="100%" src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/g9pzhgcqivub34z6wafz.gif" /> <figcaption><i>Sprite overlap fix v2</i></figcaption>
+</div>
 
 My goal isn't to make a physics accurate simulation, so this will be good enough. I may use Unreal or Unity in the future to take advantage of the physics engine.
 
