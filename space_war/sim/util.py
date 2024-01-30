@@ -8,7 +8,7 @@ import pygame
 def check_overlapping_sprites(
     sprite: pygame.sprite.Sprite, sprite_other: pygame.sprite.Sprite
 ):
-    """Returns the amount of overlap between 2 sprites"""
+    """Returns the horizontal and vertical overlap between two sprites."""
     overlap_x, overlap_y = (0, 0)
     if sprite.rect.centerx < sprite_other.rect.centerx:
         overlap_x = sprite.rect.right - sprite_other.rect.left
