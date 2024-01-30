@@ -43,7 +43,7 @@ class SpaceEntity(pygame.sprite.Sprite):
 
 <div align="center">
   <figcaption><i>The <code>SpaceEntity</code> base class represents flying objects in space. 
-  See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/base.py">space_war/sim/base.py</a> for the full source</i>
+  See <a href="https://github.com/e-dong/space-war-rl/blob/main/space_war/sim/base.py">space_war/sim/base.py</a> for the full source</i>
   </figcaption>
 </div>
 
@@ -71,7 +71,7 @@ class BaseWeapon(pygame.sprite.Sprite):
 ```
 
 <div align="center">
-  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/weapon.py">space_war/sim/weapon.py</a> for the full source</i>
+  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/main/space_war/sim/weapon.py">space_war/sim/weapon.py</a> for the full source</i>
   </figcaption>
 </div>
 
@@ -180,7 +180,7 @@ def _handle_firing_weapon_events(self, event: pygame.event.Event):
 ```
 
 <div align="center">
-  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/sim/ship.py">space_war/sim/ship.py</a> for the full source</i>
+  <figcaption><i>See <a href="https://github.com/e-dong/space-war-rl/blob/main/space_war/sim/ship.py">space_war/sim/ship.py</a> for the full source</i>
   </figcaption>
 </div>
 
@@ -192,7 +192,7 @@ The final step is to detect collisions between the weapons and ships. For this i
 
 ## Lessons Learned
 
-While implementing the weapons, I have a better understanding how inheritance works in python and the difference between the surface and rectangle. The [surface](https://pyga.me/docs/ref/surface.html) is the visible portion of drawing pixels to the screen and the [rectangle](https://pyga.me/docs/ref/rect.html) is the coordinate data. In this case, I'm using the rectangle for movement and collision detection. I also learned more about [sprite groups](https://pyga.me/docs/ref/sprite.html#pygame.sprite.Group) and how it makes it easy to manage multiple sprite instances. You can see [space_war/main.py](https://github.com/e-dong/space-war-rl/blob/add-weapons/space_war/main.py) for how I'm initializing the groups.
+While implementing the weapons, I have a better understanding how inheritance works in python and the difference between the surface and rectangle. The [surface](https://pyga.me/docs/ref/surface.html) is the visible portion of drawing pixels to the screen and the [rectangle](https://pyga.me/docs/ref/rect.html) is the coordinate data. In this case, I'm using the rectangle for movement and collision detection. I also learned more about [sprite groups](https://pyga.me/docs/ref/sprite.html#pygame.sprite.Group) and how it makes it easy to manage multiple sprite instances. You can see [space_war/main.py](https://github.com/e-dong/space-war-rl/blob/main/space_war/main.py) for how I'm initializing the groups.
 
 ## Next Steps
 
