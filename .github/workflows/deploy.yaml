@@ -1,4 +1,4 @@
-name: Deploy PR
+name: Deploy to Itch.io
 
 on:
   pull_request:
