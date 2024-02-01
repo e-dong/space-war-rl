@@ -2,6 +2,8 @@
 
 I will be remaking the 1985 version of Space War using Pygame and train deep reinforcement learning agents to battle it out. I will try to do everything from scratch as much as possible as a learning exercise!
 
+<iframe frameborder="0" src="https://itch.io/embed/2449473" width="552" height="167"><a href="https://e-dong.itch.io/spacewar">SpaceWarRL (stable) by e-dong</a></iframe>
+
 ## Quickstart Demo
 
 Run `make prod game` to startup the game in "production" mode.
