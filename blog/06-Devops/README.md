@@ -4,6 +4,12 @@ At work I learned the power of automation and how it saves valuable developer ti
 
 These are the steps I take without automation.
 
-## Setup
+1. Execute `pygbag` + `args` to create a HTML archive
+1. Navigate to the edit game page
+1. upload the archive and save the game
 
-I can do this automatically from this [github action extension](https://github.com/KikimoraGames/itch-publish). It leverages [butler](https://itch.io/docs/butler/) to automatically upload files to itch.io.
+## Automated Setup
+
+Github offers a free CI/CD platform called [Github Actions](https://docs.github.com/en/actions). I can leverage this to automate the manual steps.
+
+I will be using a third party github action extension called [itch-publish](https://github.com/KikimoraGames/itch-publish) from the github marketplace.
